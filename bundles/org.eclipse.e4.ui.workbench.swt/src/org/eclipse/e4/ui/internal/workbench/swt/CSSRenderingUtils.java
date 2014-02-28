@@ -12,7 +12,6 @@ package org.eclipse.e4.ui.internal.workbench.swt;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.eclipse.e4.ui.widgets.ImageBasedFrame;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -26,28 +25,30 @@ public class CSSRenderingUtils {
 
 	public Control frameMeIfPossible(Control toFrame, String classId,
 			boolean vertical, boolean draggable) {
-		Integer[] frameInts = new Integer[4];
-		Image frameImage = createImage(toFrame, classId, "frame-image",
-				frameInts);
-		if (vertical && frameImage != null)
-			frameImage = rotateImage(toFrame.getDisplay(), frameImage,
-					frameInts);
-
-		Image handleImage = createImage(toFrame, classId, "handle-image", null);
-		if (vertical && handleImage != null)
-			handleImage = rotateImage(toFrame.getDisplay(), handleImage, null);
-
-		if (frameImage != null) {
-			ImageBasedFrame frame = new ImageBasedFrame(toFrame.getParent(),
-					toFrame, vertical, draggable);
-			frame.setImages(frameImage, frameInts, handleImage);
-			return frame;
-		} else if (handleImage != null) {
-			ImageBasedFrame frame = new ImageBasedFrame(toFrame.getParent(),
-					toFrame, vertical, draggable);
-			frame.setImages(null, null, handleImage);
-			return frame;
-		}
+		// TODO RAP unsupported
+		// Integer[] frameInts = new Integer[4];
+		// Image frameImage = createImage(toFrame, classId, "frame-image",
+		// frameInts);
+		// if (vertical && frameImage != null)
+		// frameImage = rotateImage(toFrame.getDisplay(), frameImage,
+		// frameInts);
+		//
+		// Image handleImage = createImage(toFrame, classId, "handle-image",
+		// null);
+		// if (vertical && handleImage != null)
+		// handleImage = rotateImage(toFrame.getDisplay(), handleImage, null);
+		//
+		// if (frameImage != null) {
+		// ImageBasedFrame frame = new ImageBasedFrame(toFrame.getParent(),
+		// toFrame, vertical, draggable);
+		// frame.setImages(frameImage, frameInts, handleImage);
+		// return frame;
+		// } else if (handleImage != null) {
+		// ImageBasedFrame frame = new ImageBasedFrame(toFrame.getParent(),
+		// toFrame, vertical, draggable);
+		// frame.setImages(null, null, handleImage);
+		// return frame;
+		// }
 
 		return toFrame;
 	}

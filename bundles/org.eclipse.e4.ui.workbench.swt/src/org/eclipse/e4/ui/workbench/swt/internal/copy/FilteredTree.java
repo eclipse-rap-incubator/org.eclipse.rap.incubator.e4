@@ -46,7 +46,6 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TraverseEvent;
@@ -950,8 +949,11 @@ public class FilteredTree extends Composite {
 					.getDescriptor(DISABLED_CLEAR_ICON).createImage();
 			final Image activeImage = JFaceResources.getImageRegistry()
 					.getDescriptor(CLEAR_ICON).createImage();
+			// TODO RAP Unsupported
+			// final Image pressedImage = new Image(getDisplay(), activeImage,
+			// SWT.IMAGE_GRAY);
 			final Image pressedImage = new Image(getDisplay(), activeImage,
-					SWT.IMAGE_GRAY);
+					SWT.IMAGE_COPY);
 
 			final Label clearButton = new Label(parent, SWT.NONE);
 			clearButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
@@ -979,12 +981,14 @@ public class FilteredTree extends Composite {
 							}
 						}
 					};
-					clearButton.addMouseMoveListener(fMoveListener);
+					// TODO RAP unsupported
+					// clearButton.addMouseMoveListener(fMoveListener);
 				}
 
 				public void mouseUp(MouseEvent e) {
 					if (fMoveListener != null) {
-						clearButton.removeMouseMoveListener(fMoveListener);
+						// TODO RAP unsupported
+						// clearButton.removeMouseMoveListener(fMoveListener);
 						fMoveListener = null;
 						boolean mouseInButton = isMouseInButton(e);
 						clearButton.setImage(mouseInButton ? activeImage
@@ -1002,18 +1006,19 @@ public class FilteredTree extends Composite {
 							&& e.y < buttonSize.y;
 				}
 			});
-			clearButton.addMouseTrackListener(new MouseTrackListener() {
-				public void mouseEnter(MouseEvent e) {
-					clearButton.setImage(activeImage);
-				}
-
-				public void mouseExit(MouseEvent e) {
-					clearButton.setImage(inactiveImage);
-				}
-
-				public void mouseHover(MouseEvent e) {
-				}
-			});
+			// TODO RAP Unsupported
+			// clearButton.addMouseTrackListener(new MouseTrackListener() {
+			// public void mouseEnter(MouseEvent e) {
+			// clearButton.setImage(activeImage);
+			// }
+			//
+			// public void mouseExit(MouseEvent e) {
+			// clearButton.setImage(inactiveImage);
+			// }
+			//
+			// public void mouseHover(MouseEvent e) {
+			// }
+			// });
 			clearButton.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent e) {
 					inactiveImage.dispose();
