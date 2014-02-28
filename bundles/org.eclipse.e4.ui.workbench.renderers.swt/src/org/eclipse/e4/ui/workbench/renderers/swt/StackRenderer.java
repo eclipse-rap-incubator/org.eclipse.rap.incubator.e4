@@ -75,8 +75,6 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -942,30 +940,31 @@ public class StackRenderer extends LazyStackRenderer {
 		// Match the selected TabItem to its Part
 		final CTabFolder ctf = (CTabFolder) me.getWidget();
 
-		// Handle traverse events for accessibility
-		ctf.addTraverseListener(new TraverseListener() {
-			public void keyTraversed(TraverseEvent e) {
-				if (e.detail == SWT.TRAVERSE_ARROW_NEXT
-						|| e.detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
-					me.getTransientData().put(INHIBIT_FOCUS, true);
-				} else if (e.detail == SWT.TRAVERSE_RETURN) {
-					me.getTransientData().remove(INHIBIT_FOCUS);
-					CTabItem cti = ctf.getSelection();
-					if (cti != null) {
-						MUIElement stackElement = (MUIElement) cti
-								.getData(OWNING_ME);
-						if (stackElement instanceof MPlaceholder)
-							stackElement = ((MPlaceholder) stackElement)
-									.getRef();
-						if ((stackElement instanceof MPart)
-								&& (ctf.isFocusControl())) {
-							MPart thePart = (MPart) stackElement;
-							renderer.focusGui(thePart);
-						}
-					}
-				}
-			}
-		});
+		// FIXME RAP unsupported fixable?
+		// // Handle traverse events for accessibility
+		// ctf.addTraverseListener(new TraverseListener() {
+		// public void keyTraversed(TraverseEvent e) {
+		// if (e.detail == SWT.TRAVERSE_ARROW_NEXT
+		// || e.detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
+		// me.getTransientData().put(INHIBIT_FOCUS, true);
+		// } else if (e.detail == SWT.TRAVERSE_RETURN) {
+		// me.getTransientData().remove(INHIBIT_FOCUS);
+		// CTabItem cti = ctf.getSelection();
+		// if (cti != null) {
+		// MUIElement stackElement = (MUIElement) cti
+		// .getData(OWNING_ME);
+		// if (stackElement instanceof MPlaceholder)
+		// stackElement = ((MPlaceholder) stackElement)
+		// .getRef();
+		// if ((stackElement instanceof MPart)
+		// && (ctf.isFocusControl())) {
+		// MPart thePart = (MPart) stackElement;
+		// renderer.focusGui(thePart);
+		// }
+		// }
+		// }
+		// }
+		// });
 
 		// Detect activation...picks up cases where the user clicks on the
 		// (already active) tab

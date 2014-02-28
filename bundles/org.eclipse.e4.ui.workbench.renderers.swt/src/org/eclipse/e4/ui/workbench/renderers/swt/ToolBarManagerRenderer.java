@@ -465,7 +465,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					&& (toolBar.getStyle() & orientation) == 0) {
 				toolBar.dispose();
 			}
-			manager.setStyle(style);
+			// FIXME RAP not supported
+			// manager.setStyle(style);
 		}
 		ToolBar bar = manager.createControl(parent);
 		bar.setData(manager);

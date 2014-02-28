@@ -13,10 +13,6 @@ package org.eclipse.e4.ui.workbench.addons.minmax;
 
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -36,17 +32,18 @@ public class TrimPaneLayout extends Layout {
 	private Rectangle clientRect;
 	private boolean resizeInstalled = false;
 
-	private static int NOT_SIZING = 0;
-	private static int HORIZONTAL_SIZING = 1;
-	private static int VERTICAL_SIZING = 2;
-	private static int CORNER_SIZING = 3;
+	// private static int NOT_SIZING = 0;
+	// private static int HORIZONTAL_SIZING = 1;
+	// private static int VERTICAL_SIZING = 2;
+	// private static int CORNER_SIZING = 3;
 
 	int trackState = SWT.NONE;
 	protected Point curPos;
-	private MToolControl toolControl;
+
+	// private MToolControl toolControl;
 
 	public TrimPaneLayout(MToolControl toolControl, int barSide) {
-		this.toolControl = toolControl;
+		// this.toolControl = toolControl;
 		this.fixedCorner = barSide;
 	}
 
@@ -123,70 +120,70 @@ public class TrimPaneLayout extends Layout {
 	private void installResize(final Composite composite) {
 		if (resizeInstalled)
 			return;
-
-		composite.addMouseMoveListener(new MouseMoveListener() {
-			public void mouseMove(MouseEvent e) {
-				Point p = e.display.getCursorLocation();
-				if (trackState == NOT_SIZING) {
-					setCursor(composite, new Point(e.x, e.y));
-				} else if (trackState == HORIZONTAL_SIZING) {
-					dragHorizontal(composite, p);
-				} else if (trackState == VERTICAL_SIZING) {
-					dragVertical(composite, p);
-				} else if (trackState == CORNER_SIZING) {
-					dragCorner(composite, p);
-				}
-			}
-		});
-
-		composite.addMouseListener(new MouseListener() {
-
-			public void mouseUp(MouseEvent e) {
-				composite.setCapture(false);
-
-				// Persist the current size
-				Point size = composite.getSize();
-				toolControl.getPersistedState()
-						.put(TrimStack.STATE_XSIZE, Integer.toString(size.x));
-				toolControl.getPersistedState()
-						.put(TrimStack.STATE_YSIZE, Integer.toString(size.y));
-
-				trackState = NOT_SIZING;
-			}
-
-			public void mouseDown(MouseEvent e) {
-				Point p = new Point(e.x, e.y);
-				if (hSizingRect.contains(p)) {
-					curPos = e.display.getCursorLocation();
-					trackState = HORIZONTAL_SIZING;
-					composite.setCapture(true);
-				} else if (vSizingRect.contains(p)) {
-					curPos = e.display.getCursorLocation();
-					trackState = VERTICAL_SIZING;
-					composite.setCapture(true);
-				} else if (cornerRect.contains(p)) {
-					curPos = e.display.getCursorLocation();
-					trackState = CORNER_SIZING;
-					composite.setCapture(true);
-				}
-			}
-
-			public void mouseDoubleClick(MouseEvent e) {
-			}
-		});
-
-		composite.addMouseTrackListener(new MouseTrackListener() {
-			public void mouseHover(MouseEvent e) {
-			}
-
-			public void mouseExit(MouseEvent e) {
-				Composite comp = (Composite) e.widget;
-				comp.setCursor(null);
-			}
-
-			public void mouseEnter(MouseEvent e) {
-			}
-		});
+		// FIXME RAP not supported
+		// composite.addMouseMoveListener(new MouseMoveListener() {
+		// public void mouseMove(MouseEvent e) {
+		// Point p = e.display.getCursorLocation();
+		// if (trackState == NOT_SIZING) {
+		// setCursor(composite, new Point(e.x, e.y));
+		// } else if (trackState == HORIZONTAL_SIZING) {
+		// dragHorizontal(composite, p);
+		// } else if (trackState == VERTICAL_SIZING) {
+		// dragVertical(composite, p);
+		// } else if (trackState == CORNER_SIZING) {
+		// dragCorner(composite, p);
+		// }
+		// }
+		// });
+		//
+		// composite.addMouseListener(new MouseListener() {
+		//
+		// public void mouseUp(MouseEvent e) {
+		// composite.setCapture(false);
+		//
+		// // Persist the current size
+		// Point size = composite.getSize();
+		// toolControl.getPersistedState()
+		// .put(TrimStack.STATE_XSIZE, Integer.toString(size.x));
+		// toolControl.getPersistedState()
+		// .put(TrimStack.STATE_YSIZE, Integer.toString(size.y));
+		//
+		// trackState = NOT_SIZING;
+		// }
+		//
+		// public void mouseDown(MouseEvent e) {
+		// Point p = new Point(e.x, e.y);
+		// if (hSizingRect.contains(p)) {
+		// curPos = e.display.getCursorLocation();
+		// trackState = HORIZONTAL_SIZING;
+		// composite.setCapture(true);
+		// } else if (vSizingRect.contains(p)) {
+		// curPos = e.display.getCursorLocation();
+		// trackState = VERTICAL_SIZING;
+		// composite.setCapture(true);
+		// } else if (cornerRect.contains(p)) {
+		// curPos = e.display.getCursorLocation();
+		// trackState = CORNER_SIZING;
+		// composite.setCapture(true);
+		// }
+		// }
+		//
+		// public void mouseDoubleClick(MouseEvent e) {
+		// }
+		// });
+		//
+		// composite.addMouseTrackListener(new MouseTrackListener() {
+		// public void mouseHover(MouseEvent e) {
+		// }
+		//
+		// public void mouseExit(MouseEvent e) {
+		// Composite comp = (Composite) e.widget;
+		// comp.setCursor(null);
+		// }
+		//
+		// public void mouseEnter(MouseEvent e) {
+		// }
+		// });
 
 		resizeInstalled = true;
 	}
