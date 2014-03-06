@@ -5,5 +5,5 @@
       <provide interface="org.eclipse.e4.core.contexts.IContextFunction"/>
    </service>
    <property name="service.context.key" type="String" value="org.eclipse.e4.core.services.events.IEventBroker"/>
-   <property name="service.ranking" type="Integer" value="-1"/>
+   <property name="service.ranking" type="Integer" value="100"/>
 </scr:component>
