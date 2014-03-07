@@ -5,10 +5,6 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 
 public class RAPEventBrokerContextFunction extends ContextFunction {
-	public RAPEventBrokerContextFunction() {
-		System.err.println("RAP CONTEXT FUNCTION");
-	}
-	
 	@Override
 	public Object compute(IEclipseContext context) {
 		RAPEventBroker broker = context.getLocal(RAPEventBroker.class);
