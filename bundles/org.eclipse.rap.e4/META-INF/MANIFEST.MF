@@ -18,7 +18,8 @@ Require-Bundle: org.eclipse.rap.rwt,
 Export-Package: org.eclipse.rap.e4
 Import-Package: javax.annotation;version="1.2.0",
  javax.inject;version="1.0.0"
-Service-Component: OSGI-INF/rapeventbroker.xml
+Service-Component: OSGI-INF/rapeventbroker.xml,OSGI-INF/rapeventobjectsupplier.xml,
+ OSGI-INF/rapuieventobjectsupplier.xml
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.rap.e4.internal.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

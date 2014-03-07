@@ -25,6 +25,7 @@ import org.eclipse.rap.rwt.application.EntryPoint;
 import org.eclipse.rap.rwt.application.EntryPointFactory;
 import org.eclipse.rap.rwt.application.IEntryPoint;
 import org.eclipse.rap.rwt.application.IEntryPointFactory;
+import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -57,12 +58,16 @@ public class E4EntryPointFactory implements EntryPointFactory {
 	}
 	
 	private int createWorkbench() {
-		System.err.println("CREATING WORKBENCH");
 		Display display = new Display();
 		E4Application e4App = new E4Application();
 		E4Workbench workbench = e4App.createE4Workbench(getApplicationContext(config),
 				display);
 
+		if( config.isDefaultPush() ) {
+			ServerPushSession session = new ServerPushSession();
+			session.start();
+		}
+		
 //		instanceLocation = (Location) workbench.getContext().get(
 //				E4Workbench.INSTANCE_LOCATION);
 		Shell shell = display.getActiveShell();

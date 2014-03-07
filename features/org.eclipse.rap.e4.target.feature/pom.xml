@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<name>RAP e4 target runtime build - Target Platform Feature</name>
 	<groupId>org.eclipse.rap.e4</groupId>
-	<artifactId>org.eclipse.rap.e4.base.feature</artifactId>
+	<artifactId>org.eclipse.rap.e4.target.feature</artifactId>
 	<packaging>eclipse-feature</packaging>
 	
 	<parent>

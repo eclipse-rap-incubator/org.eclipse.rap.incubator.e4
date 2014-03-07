@@ -9,11 +9,13 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.UISynchronize;
+import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.osgi.util.NLS;
@@ -37,8 +39,9 @@ public class RAPEventBroker implements IEventBroker {
 		@Optional
 		UISynchronize uiSync;
 		
-//		@Inject
-//		String instanceId;
+		@Inject
+		@Named(E4Application.INSTANCEID)
+		String instanceId;
 		
 		// This is a temporary code to ensure that bundle containing
 		// EventAdmin implementation is started. This code it to be removed once
@@ -62,7 +65,6 @@ public class RAPEventBroker implements IEventBroker {
 		
 		public RAPEventBroker() {
 			// placeholder
-			System.err.println("THIS IS THE RAP EVENT BROKER!!!!");
 		}
 
 		public boolean send(String topic, Object data) {
@@ -89,7 +91,7 @@ public class RAPEventBroker implements IEventBroker {
 
 		@SuppressWarnings("unchecked")
 		private Event constructEvent(String topic, Object data) {
-			topic = rapifyTopic(topic);
+			topic = rapifyTopic(instanceId, topic);
 			Event event;
 			if (data instanceof Dictionary<?,?>) {
 				event = new Event(topic, (Dictionary<String,?>)data);
@@ -110,7 +112,7 @@ public class RAPEventBroker implements IEventBroker {
 		}
 		
 		public boolean subscribe(String topic, String filter, EventHandler eventHandler, boolean headless) {
-			topic = rapifyTopic(topic);
+			topic = rapifyTopic(instanceId, topic);
 			BundleContext bundleContext = Activator.getDefault().getBundleContext();
 			if (bundleContext == null) {
 				logger.error(NLS.bind("No EventAdmin", topic));
@@ -159,10 +161,8 @@ public class RAPEventBroker implements IEventBroker {
 			}
 		}
 		
-		private String rapifyTopic(String topic) {
-//			String wbId = workbench.getId();
-			String wbId = System.identityHashCode(logger) + "";
-			String rv = wbId + "/" + topic;
+		public static String rapifyTopic(String instanceId, String topic) {
+			String rv = instanceId + "/" + topic;
 			System.err.println("Original: " + topic + ", RAPified: " + rv);
 			return rv;
 		}

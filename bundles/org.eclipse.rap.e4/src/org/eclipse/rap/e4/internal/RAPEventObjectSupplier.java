@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.core.di.IInjector;
 import org.eclipse.e4.core.di.InjectionException;
@@ -20,6 +22,7 @@ import org.eclipse.e4.core.di.internal.extensions.DIEActivator;
 import org.eclipse.e4.core.di.suppliers.ExtendedObjectSupplier;
 import org.eclipse.e4.core.di.suppliers.IObjectDescriptor;
 import org.eclipse.e4.core.di.suppliers.IRequestor;
+import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -29,6 +32,7 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
+@SuppressWarnings("restriction")
 public class RAPEventObjectSupplier extends ExtendedObjectSupplier {
 
 	// This is a temporary code to ensure that bundle containing
@@ -125,6 +129,10 @@ public class RAPEventObjectSupplier extends ExtendedObjectSupplier {
 	}
 
 	private Map<Subscriber, ServiceRegistration> registrations = new HashMap<Subscriber, ServiceRegistration>();
+	
+	@Inject
+	@Named(E4Application.INSTANCEID)
+	protected String instanceId;
 
 	protected void addCurrentEvent(String topic, Event event) {
 		synchronized (currentEvents) {
@@ -191,7 +199,9 @@ public class RAPEventObjectSupplier extends ExtendedObjectSupplier {
 		if (descriptor == null)
 			return null;
 		EventTopic qualifier = descriptor.getQualifier(EventTopic.class);
-		return qualifier.value();
+		String topic = qualifier.value();
+		topic = RAPEventBroker.rapifyTopic(instanceId, topic);
+		return topic;
 	}
 
 	static private EventAdmin getEventAdmin() {
