@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.UUID;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -107,6 +108,8 @@ public class E4Application implements IApplication {
 	private static final String APPLICATION_MODEL_PATH_DEFAULT = "Application.e4xmi";
 	private static final String PERSPECTIVE_ARG_NAME = "perspective";
 	private static final String DEFAULT_THEME_ID = "org.eclipse.e4.ui.css.theme.e4_default";
+
+	public static final String INSTANCEID = "E4Application.instanceId";
 
 	private String[] args;
 
@@ -200,7 +203,7 @@ public class E4Application implements IApplication {
 		args = (String[]) applicationContext.getArguments().get(
 				IApplicationContext.APPLICATION_ARGS);
 
-		IEclipseContext appContext = createDefaultContext();
+		final IEclipseContext appContext = createDefaultContext();
 		appContext.set(Display.class, display);
 		appContext.set(Realm.class, SWTObservables.getRealm(display));
 		appContext.set(UISynchronize.class, new UISynchronize() {
@@ -336,7 +339,12 @@ public class E4Application implements IApplication {
 
 		// Instantiate the Workbench (which is responsible for
 		// 'running' the UI (if any)...
-		return workbench = new E4Workbench(appModel, appContext);
+		return workbench = new E4Workbench(appModel, appContext) {
+			@Override
+			protected String createId() {
+				return (String) appContext.get(INSTANCEID);
+			}
+		};
 	}
 
 	private MApplication loadApplicationModel(IApplicationContext appContext,
@@ -480,7 +488,7 @@ public class E4Application implements IApplication {
 		IEclipseContext serviceContext = createDefaultHeadlessContext();
 		final IEclipseContext appContext = serviceContext
 				.createChild("WorkbenchContext"); //$NON-NLS-1$
-
+		appContext.set(INSTANCEID, UUID.randomUUID().toString());
 		appContext
 				.set(Logger.class, ContextInjectionFactory.make(
 						WorkbenchLogger.class, appContext));
