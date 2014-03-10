@@ -5,6 +5,7 @@
       <children xsi:type="basic:Part" xmi:id="_FzadAKCAEeOCJ5u74o02rg" elementId="org.eclipse.rap.e4.demo.part.0" containerData="100"/>
       <children xsi:type="basic:PartStack" xmi:id="_M-uNIKCAEeOCJ5u74o02rg" elementId="org.eclipse.rap.e4.demo.partstack.0" containerData="300">
         <children xsi:type="basic:Part" xmi:id="_GwxdIKCAEeOCJ5u74o02rg" elementId="org.eclipse.rap.e4.demo.part.1" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.parts.EventSamplePart" label="Event Tests"/>
+        <children xsi:type="basic:Part" xmi:id="_rk6l0KhAEeO0Haj3z6o3PQ" elementId="org.eclipse.rap.e4.demo.part.2" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.parts.PreferenceSamplePart" label="Preference Test"/>
       </children>
     </children>
   </children>
