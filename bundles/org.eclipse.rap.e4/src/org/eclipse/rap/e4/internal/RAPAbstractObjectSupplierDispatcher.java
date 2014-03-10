@@ -15,6 +15,7 @@ import org.eclipse.e4.core.internal.contexts.EclipseContext;
 import org.eclipse.e4.core.internal.contexts.IContextDisposalListener;
 import org.eclipse.e4.core.internal.di.Requestor;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
+import org.eclipse.rap.e4.preferences.EPreferenceService;
 
 @SuppressWarnings("restriction")
 public abstract class RAPAbstractObjectSupplierDispatcher<S extends ExtendedObjectSupplier> extends ExtendedObjectSupplier {

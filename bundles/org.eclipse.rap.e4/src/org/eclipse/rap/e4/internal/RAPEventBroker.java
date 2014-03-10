@@ -163,7 +163,7 @@ public class RAPEventBroker implements IEventBroker {
 		
 		public static String rapifyTopic(String instanceId, String topic) {
 			String rv = instanceId + "/" + topic;
-			System.err.println("Original: " + topic + ", RAPified: " + rv);
+//			System.err.println("Original: " + topic + ", RAPified: " + rv);
 			return rv;
 		}
 }
