@@ -86,6 +86,8 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.service.SettingStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
@@ -530,6 +532,9 @@ public class E4Application implements IApplication {
 		TranslationService bundleTranslationProvider = TranslationProviderFactory
 				.bundleTranslationService(appContext);
 		appContext.set(TranslationService.class, bundleTranslationProvider);
+
+		// TODO RAP specific stuff
+		appContext.set(SettingStore.class, RWT.getSettingStore());
 
 		return appContext;
 	}
