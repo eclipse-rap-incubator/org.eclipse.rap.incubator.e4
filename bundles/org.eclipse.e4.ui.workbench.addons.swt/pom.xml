@@ -13,5 +13,22 @@
 		<relativePath>../../releng/releng-target/pom.xml</relativePath>
 		<version>0.9.0-SNAPSHOT</version>
 	</parent>
-
+	
+	<build>
+		<resources>
+			<!-- to ensure that the feature lookup of the ui test works -->
+			<resource>
+				<directory>.</directory>
+				<includes>
+					<include>META-INF/</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-source-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>
