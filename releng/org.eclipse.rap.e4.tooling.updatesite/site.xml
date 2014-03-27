@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.eclipse.rap.e4.tooling.feature_0.9.0.qualifier.jar" id="org.eclipse.rap.e4.tooling.feature" version="0.9.0.qualifier">
+      <category name="e4tools"/>
+   </feature>
+   <category-def name="e4tools" label="RAP e4 Tooling"/>
+</site>
