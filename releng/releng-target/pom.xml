@@ -43,10 +43,20 @@
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/rap-incubator/e4/base-target</url>
 		</repository-->
-		<repository>
+		<!--  repository>
 			<id>workspace</id>
 			<layout>p2</layout>
 			<url>file:///Users/tomschindl/git/rap-e4-incubator/releng/org.eclipse.rap.e4.base.updatesite/target/site</url>
+		</repository-->
+		<repository>
+			<id>rap-nightly</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/rt/rap/nightly/runtime/</url>
+		</repository>
+		<repository>
+			<id>luna-i-build</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/eclipse/updates/4.4-I-builds</url>
 		</repository>
 	</repositories>
 
