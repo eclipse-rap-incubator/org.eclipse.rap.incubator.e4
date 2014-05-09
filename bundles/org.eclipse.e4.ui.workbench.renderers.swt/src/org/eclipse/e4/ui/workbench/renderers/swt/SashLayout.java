@@ -60,20 +60,24 @@ public class SashLayout extends Layout {
 	public SashLayout(final Composite host, MUIElement root) {
 		this.root = root;
 		this.host = host;
-		// FIXME RAP
+		// FIXME RAP does not support this
 		// host.addMouseTrackListener(new MouseTrackListener() {
+		// @Override
 		// public void mouseHover(MouseEvent e) {
 		// }
 		//
+		// @Override
 		// public void mouseExit(MouseEvent e) {
 		// host.setCursor(null);
 		// }
 		//
+		// @Override
 		// public void mouseEnter(MouseEvent e) {
 		// }
 		// });
 		//
 		// host.addMouseMoveListener(new MouseMoveListener() {
+		// @Override
 		// public void mouseMove(final MouseEvent e) {
 		// if (!draggingSashes) {
 		// // Set the cursor feedback
@@ -106,11 +110,13 @@ public class SashLayout extends Layout {
 		// });
 		//
 		// host.addMouseListener(new MouseListener() {
+		// @Override
 		// public void mouseUp(MouseEvent e) {
 		// host.setCapture(false);
 		// draggingSashes = false;
 		// }
 		//
+		// @Override
 		// public void mouseDown(MouseEvent e) {
 		// if (e.button != 1) {
 		// return;
@@ -123,11 +129,13 @@ public class SashLayout extends Layout {
 		// }
 		// }
 		//
+		// @Override
 		// public void mouseDoubleClick(MouseEvent e) {
 		// }
 		// });
-
+		//
 		// host.addPaintListener(new PaintListener() {
+		// @Override
 		// public void paintControl(PaintEvent e) {
 		// // for (SashRect sr : sashes) {
 		// // Color color;

@@ -32,6 +32,7 @@ public class FaderAnimationFeedback extends	AnimationFeedbackBase {
 		super(parentShell);
 	}
 
+	@Override
 	public void dispose() {
 		super.dispose();
 
@@ -39,6 +40,7 @@ public class FaderAnimationFeedback extends	AnimationFeedbackBase {
 			backingStore.dispose();
 	}
 
+	@Override
 	public void initialize(AnimationEngine engine) {
 		// Rectangle psRect = getBaseShell().getBounds();
 		// getAnimationShell().setBounds(psRect);
@@ -56,6 +58,7 @@ public class FaderAnimationFeedback extends	AnimationFeedbackBase {
 		// getAnimationShell().setVisible(true);
 	}
 
+	@Override
 	public void renderStep(AnimationEngine engine) {
 		getAnimationShell().setAlpha((int) (255 - (engine.amount()*255)));
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 IBM Corporation and others.
+ * Copyright (c) 2012, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,9 @@ import org.eclipse.swt.widgets.Display;
 import org.w3c.dom.css.CSSValue;
 
 public class CSSRenderingUtils {
+	private final static String FRAME_IMAGE_PROP = "frame-image";
+
+	private final static String HANDLE_IMAGE_PROP = "handle-image";
 
 	// NOTE: The CSS engine 'owns' the image it returns (it caches it)
 	// so we have to cache any rotated versions to match
@@ -25,15 +28,15 @@ public class CSSRenderingUtils {
 
 	public Control frameMeIfPossible(Control toFrame, String classId,
 			boolean vertical, boolean draggable) {
-		// TODO RAP unsupported
-		// Integer[] frameInts = new Integer[4];
-		// Image frameImage = createImage(toFrame, classId, "frame-image",
+		Integer[] frameInts = new Integer[4];
+		// FIXME RAP unsupported
+		// Image frameImage = createImage(toFrame, classId, FRAME_IMAGE_PROP,
 		// frameInts);
 		// if (vertical && frameImage != null)
 		// frameImage = rotateImage(toFrame.getDisplay(), frameImage,
 		// frameInts);
 		//
-		// Image handleImage = createImage(toFrame, classId, "handle-image",
+		// Image handleImage = createImage(toFrame, classId, HANDLE_IMAGE_PROP,
 		// null);
 		// if (vertical && handleImage != null)
 		// handleImage = rotateImage(toFrame.getDisplay(), handleImage, null);
@@ -42,11 +45,13 @@ public class CSSRenderingUtils {
 		// ImageBasedFrame frame = new ImageBasedFrame(toFrame.getParent(),
 		// toFrame, vertical, draggable);
 		// frame.setImages(frameImage, frameInts, handleImage);
+		// addFrameImageDisposedListener(frame, toFrame, classId, vertical);
 		// return frame;
 		// } else if (handleImage != null) {
 		// ImageBasedFrame frame = new ImageBasedFrame(toFrame.getParent(),
 		// toFrame, vertical, draggable);
 		// frame.setImages(null, null, handleImage);
+		// addHandleImageDisposedListener(frame, toFrame, classId, vertical);
 		// return frame;
 		// }
 
@@ -54,7 +59,7 @@ public class CSSRenderingUtils {
 	}
 
 	private Image rotateImage(Display display, Image image, Integer[] frameInts) {
-		// TODO RAP unsupported
+		// FIXME RAP unsupported
 		// // Swap the widths / heights of the 'cuts'
 		// if (frameInts != null) {
 		// int tmp;
@@ -105,12 +110,12 @@ public class CSSRenderingUtils {
 		//
 		// // Return the new one
 		// return rotatedImage;
-		return image;
+		return null;
 	}
 
 	public CSSValue getCSSValue(Control styleControl, String className,
 			String attributeName) {
-		// TODO RAP unsupported
+		// FIXME RAP unsupported
 		// CSSEngine csseng = WidgetElement.getEngine(styleControl);
 		// if (csseng == null) {
 		// return null;
@@ -142,9 +147,8 @@ public class CSSRenderingUtils {
 	 */
 	public Image createImage(Control styleControl, String classId,
 			String attName, Integer[] frameInts) {
-		// TODO RAP unsupported
-		// Image image = null;
-		//
+		Image image = null;
+		// FIXME RAP unsupported
 		// CSSEngine csseng = WidgetElement.getEngine(styleControl);
 		// if (csseng == null) {
 		// return null;
@@ -200,7 +204,102 @@ public class CSSRenderingUtils {
 		// } catch (Exception e1) {
 		// }
 		// }
-		// return image;
-		return null;
+		return image;
 	}
+	// FIXME RAP unsupported
+	// private void addHandleImageDisposedListener(
+	// ImageBasedFrame imageBasedFrame, final Control toFrame,
+	// final String classId, final boolean vertical) {
+	// final Listener listener = new Listener() {
+	// @Override
+	// public void handleEvent(Event event) {
+	// if (!(event.widget instanceof ImageBasedFrame)) {
+	// return;
+	// }
+	//
+	// ImageBasedFrame frame = (ImageBasedFrame) event.widget;
+	// if (!isImagesRefreshRequired(frame)) {
+	// return;
+	// }
+	//
+	// Image handleImage = createImage(toFrame, classId,
+	// HANDLE_IMAGE_PROP, null);
+	// if (vertical && handleImage != null) {
+	// handleImage = rotateImage(toFrame.getDisplay(),
+	// handleImage, null);
+	// }
+	// if (handleImage != null) {
+	// frame.setImages(null, null, handleImage);
+	// }
+	// }
+	// };
+	//
+	// toFrame.getDisplay().addListener(SWT.Skin, listener);
+	//
+	// imageBasedFrame.addDisposeListener(new DisposeListener() {
+	// @Override
+	// public void widgetDisposed(DisposeEvent e) {
+	// e.widget.getDisplay().removeListener(SWT.Skin, listener);
+	// }
+	// });
+	// }
+	//
+	// private void addFrameImageDisposedListener(ImageBasedFrame
+	// imageBasedFrame,
+	// final Control toFrame, final String classId, final boolean vertical) {
+	// final Listener listener = new Listener() {
+	// @Override
+	// public void handleEvent(Event event) {
+	// if (!(event.widget instanceof ImageBasedFrame)) {
+	// return;
+	// }
+	//
+	// ImageBasedFrame frame = (ImageBasedFrame) event.widget;
+	// if (!isImagesRefreshRequired(frame)) {
+	// return;
+	// }
+	//
+	// Integer[] frameInts = new Integer[4];
+	// Image frameImage = createImage(toFrame, classId,
+	// FRAME_IMAGE_PROP, frameInts);
+	// if (vertical && frameImage != null) {
+	// frameImage = rotateImage(toFrame.getDisplay(), frameImage,
+	// frameInts);
+	// }
+	//
+	// Image handleImage = createImage(toFrame, classId,
+	// HANDLE_IMAGE_PROP, null);
+	// if (vertical && handleImage != null) {
+	// handleImage = rotateImage(toFrame.getDisplay(),
+	// handleImage, null);
+	// }
+	// if (frameImage != null) {
+	// frame.setImages(frameImage, frameInts, handleImage);
+	// }
+	// }
+	// };
+	//
+	// toFrame.getDisplay().addListener(SWT.Skin, listener);
+	//
+	// imageBasedFrame.addDisposeListener(new DisposeListener() {
+	// @Override
+	// public void widgetDisposed(DisposeEvent e) {
+	// e.widget.getDisplay().removeListener(SWT.Skin, listener);
+	// }
+	// });
+	// }
+	//
+	// private boolean isImagesRefreshRequired(ImageBasedFrame frame) {
+	// Object handleImage = frame.getData("handleImage");
+	// if (handleImage instanceof Image && ((Image) handleImage).isDisposed()) {
+	// return true;
+	// }
+	//
+	// Object frameImage = frame.getData("frameImage");
+	// if (frameImage instanceof Image && ((Image) frameImage).isDisposed()) {
+	// return true;
+	// }
+	//
+	// return false;
+	// }
 }
