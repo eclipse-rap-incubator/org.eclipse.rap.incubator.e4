@@ -23,6 +23,11 @@ import org.eclipse.swt.widgets.Layout;
  *
  */
 public class TrimPaneLayout extends Layout {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private static int BORDER_WIDTH = 4;
 	private int fixedCorner;
 
@@ -120,8 +125,14 @@ public class TrimPaneLayout extends Layout {
 	private void installResize(final Composite composite) {
 		if (resizeInstalled)
 			return;
-		// FIXME RAP not supported
+		// FIXME RAP Needs native support on client
 		// composite.addMouseMoveListener(new MouseMoveListener() {
+		// /**
+		// *
+		// */
+		// private static final long serialVersionUID = 1L;
+		//
+		// @Override
 		// public void mouseMove(MouseEvent e) {
 		// Point p = e.display.getCursorLocation();
 		// if (trackState == NOT_SIZING) {
@@ -138,6 +149,12 @@ public class TrimPaneLayout extends Layout {
 		//
 		// composite.addMouseListener(new MouseListener() {
 		//
+		// /**
+		// *
+		// */
+		// private static final long serialVersionUID = 1L;
+		//
+		// @Override
 		// public void mouseUp(MouseEvent e) {
 		// composite.setCapture(false);
 		//
@@ -151,6 +168,7 @@ public class TrimPaneLayout extends Layout {
 		// trackState = NOT_SIZING;
 		// }
 		//
+		// @Override
 		// public void mouseDown(MouseEvent e) {
 		// Point p = new Point(e.x, e.y);
 		// if (hSizingRect.contains(p)) {
@@ -168,24 +186,33 @@ public class TrimPaneLayout extends Layout {
 		// }
 		// }
 		//
+		// @Override
 		// public void mouseDoubleClick(MouseEvent e) {
 		// }
 		// });
 		//
 		// composite.addMouseTrackListener(new MouseTrackListener() {
+		// /**
+		// *
+		// */
+		// private static final long serialVersionUID = 1L;
+		//
+		// @Override
 		// public void mouseHover(MouseEvent e) {
 		// }
 		//
+		// @Override
 		// public void mouseExit(MouseEvent e) {
 		// Composite comp = (Composite) e.widget;
 		// comp.setCursor(null);
 		// }
 		//
+		// @Override
 		// public void mouseEnter(MouseEvent e) {
 		// }
 		// });
-
-		resizeInstalled = true;
+		//
+		// resizeInstalled = true;
 	}
 
 	/**
