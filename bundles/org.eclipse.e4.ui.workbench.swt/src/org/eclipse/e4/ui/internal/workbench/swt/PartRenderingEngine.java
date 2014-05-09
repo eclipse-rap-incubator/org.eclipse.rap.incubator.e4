@@ -1014,8 +1014,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 			@Override
 			public void run() {
-				// TODO RAP unsupported
-				// initializeStyling(display, runContext);
+				initializeStyling(display, runContext);
 
 				// Register an SWT resource handler
 				runContext.set(IResourceUtilities.class.getName(),
@@ -1225,6 +1224,13 @@ public class PartRenderingEngine implements IPresentationEngine {
 				keyListener = null;
 			}
 		}
+	}
+
+	public static void initializeStyling(Display display,
+			IEclipseContext appContext) {
+		CSSRenderingUtils cssUtils = ContextInjectionFactory.make(
+				CSSRenderingUtils.class, appContext);
+		appContext.set(CSSRenderingUtils.class, cssUtils);
 	}
 
 	// FIXME RAP unsupported
