@@ -148,6 +148,10 @@ public class E4Application implements IApplication {
 		try {
 			E4Workbench workbench = createE4Workbench(applicationContext,
 					display);
+			if (workbench == null) {
+				display.dispose();
+				return EXIT_OK;
+			}
 
 			instanceLocation = (Location) workbench.getContext().get(
 					E4Workbench.INSTANCE_LOCATION);
@@ -238,8 +242,13 @@ public class E4Application implements IApplication {
 			lcManager = factory.create(lifeCycleURI, appContext);
 			if (lcManager != null) {
 				// Let the manager manipulate the appContext if desired
-				ContextInjectionFactory.invoke(lcManager,
-						PostContextCreate.class, appContext, null);
+				Object state = ContextInjectionFactory.invoke(lcManager,
+						PostContextCreate.class, appContext, Boolean.TRUE);
+				if (state != null && state instanceof Boolean) {
+					if (!((Boolean) state).booleanValue()) {
+						return null;
+					}
+				}
 			}
 		}
 

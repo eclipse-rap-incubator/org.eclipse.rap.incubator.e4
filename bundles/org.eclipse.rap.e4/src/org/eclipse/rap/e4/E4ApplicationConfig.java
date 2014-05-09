@@ -45,7 +45,15 @@ public class E4ApplicationConfig {
 		return new E4ApplicationConfig(xmiURI, null, null, true, false, true);
 	}
 	
+	public static E4ApplicationConfig create(String xmiURI, String lifecycleURI) {
+		return new E4ApplicationConfig(xmiURI, lifecycleURI, null, true, false, true);
+	}
+	
 	public static E4ApplicationConfig create(String xmiURI, boolean defaultPush) {
 		return new E4ApplicationConfig(xmiURI, null, null, true, false, true);
+	}
+	
+	public static E4ApplicationConfig create(String xmiURI, String lifecycleURI, boolean defaultPush) {
+		return new E4ApplicationConfig(xmiURI, lifecycleURI, null, true, false, true);
 	}
 }
