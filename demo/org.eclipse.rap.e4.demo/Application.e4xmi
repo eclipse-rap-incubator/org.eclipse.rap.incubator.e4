@@ -18,8 +18,12 @@
         <children xsi:type="basic:Part" xmi:id="_JBUKsKhHEeO0Haj3z6o3PQ" elementId="org.eclipse.rap.e4.demo.part.3" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.parts.NLSSamplePart" label="%part.label.3">
           <menus xmi:id="_4EurEOGcEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.menu.3">
             <tags>ViewMenu</tags>
-            <children xsi:type="menu:DirectMenuItem" xmi:id="_4nG_YOGcEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.directmenuitem.2" label="Hello extra"/>
+            <children xsi:type="menu:DirectMenuItem" xmi:id="_4nG_YOGcEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.directmenuitem.2" label="Hello extra" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.handlers.HelloWorldHandler"/>
           </menus>
+          <toolbar xmi:id="_6O4mwOGiEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.toolbar.2">
+            <tags>ContentArea</tags>
+            <children xsi:type="menu:DirectToolItem" xmi:id="_7pm4UOGiEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.directtoolitem.2" label="Hello World" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.handlers.HelloWorldHandler"/>
+          </toolbar>
         </children>
       </children>
     </children>
