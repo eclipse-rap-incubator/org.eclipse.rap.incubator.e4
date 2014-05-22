@@ -720,7 +720,8 @@ public class StackRenderer extends LazyStackRenderer {
 
 			// Hide the old TB if we're changing
 			if (part != curPart && curPart != null
-					&& curPart.getToolbar() != null) {
+					&& curPart.getToolbar() != null
+					&& !curPart.getToolbar().getTags().contains("ContentArea")) { //$NON-NLS-1$
 				// RCP does reparenting curPart.getToolbar().setVisible(false);
 				Control c = (Control) curPart.getToolbar().getWidget();
 				c.setVisible(false);
@@ -732,7 +733,8 @@ public class StackRenderer extends LazyStackRenderer {
 			Control[] kids = trComp.getChildren();
 
 			boolean needsTB = part != null && part.getToolbar() != null
-					&& part.getToolbar().isToBeRendered();
+					&& part.getToolbar().isToBeRendered()
+					&& !part.getToolbar().getTags().contains("ContentArea"); //$NON-NLS-1$
 
 			// View menu (if any)
 			MMenu viewMenu = getViewMenu(part);

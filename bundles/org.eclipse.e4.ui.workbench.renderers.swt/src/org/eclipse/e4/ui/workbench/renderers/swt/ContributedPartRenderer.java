@@ -27,6 +27,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -46,6 +48,9 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 	@Inject
 	@Optional
 	private Logger logger;
+
+	@Inject
+	IPresentationEngine renderer;
 
 	private MPart partToActivate;
 
@@ -71,11 +76,16 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 		if (!(element instanceof MPart) || !(parent instanceof Composite))
 			return null;
 
+
+
 		Widget parentWidget = (Widget) parent;
 		Widget newWidget = null;
 		final MPart part = (MPart) element;
 
-		final Composite newComposite = new Composite((Composite) parentWidget,
+		boolean contentToolBar = part.getToolbar() != null
+				&& part.getToolbar().getTags().contains("ContentArea"); //$NON-NLS-1$
+
+		Composite newComposite = new Composite((Composite) parentWidget,
 				SWT.NONE) {
 
 			/**
@@ -113,10 +123,19 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 			}
 		};
 
-		newComposite.setLayout(new FillLayout(SWT.VERTICAL));
-
+		bindWidget(element, newComposite);
 		newWidget = newComposite;
-		bindWidget(element, newWidget);
+
+		if (contentToolBar) {
+			newComposite.setLayout(new GridLayout());
+			Control toolbar = (Control) renderer.createGui(part.getToolbar(),
+					newComposite, part.getContext());
+			toolbar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			newComposite = new Composite(newComposite, SWT.NONE);
+			newComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		}
+
+		newComposite.setLayout(new FillLayout(SWT.VERTICAL));
 
 		// Create a context for this part
 		IEclipseContext localContext = part.getContext();
