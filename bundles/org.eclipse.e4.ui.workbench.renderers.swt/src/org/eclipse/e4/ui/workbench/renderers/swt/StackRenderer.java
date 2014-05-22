@@ -24,6 +24,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.SWTRenderersMessages;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
@@ -53,6 +54,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler.Save;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
@@ -73,6 +75,8 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -81,6 +85,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 import org.osgi.service.event.Event;
@@ -637,148 +642,162 @@ public class StackRenderer extends LazyStackRenderer {
 	 * @param ctf
 	 */
 	private void addTopRight(CTabFolder ctf) {
-//FIXME RAP unsupported
-//		Composite trComp = new Composite(ctf, SWT.NONE);
-//		trComp.setBackground(Display.getCurrent().getSystemColor(
-//				SWT.COLOR_DARK_CYAN));
-//		RowLayout rl = new RowLayout();
-//		trComp.setLayout(rl);
-//		rl.marginBottom = rl.marginTop = rl.marginRight = rl.marginLeft = 0;
-//		ctf.setTopRight(trComp, SWT.RIGHT | SWT.WRAP);
-//
-//		// Initially it's not visible
-//		trComp.setVisible(false);
-//
-//		// Create a TB for the view's drop-down menu
-//		ToolBar menuTB = new ToolBar(trComp, SWT.FLAT | SWT.RIGHT);
-//		menuTB.setData(TAG_VIEW_MENU);
-//		RowData rd = new RowData();
-//		menuTB.setLayoutData(rd);
-//		ToolItem ti = new ToolItem(menuTB, SWT.PUSH);
-//		ti.setImage(getViewMenuImage());
-//		ti.setHotImage(null);
-//		ti.setToolTipText(SWTRenderersMessages.viewMenu);
-//
-//		// Initially it's not visible
-//		rd.exclude = true;
-//		menuTB.setVisible(false);
-//
-//		ti.addSelectionListener(new SelectionListener() {
-//			@Override
-//			public void widgetSelected(SelectionEvent e) {
-//				showMenu((ToolItem) e.widget);
-//			}
-//
-//			@Override
-//			public void widgetDefaultSelected(SelectionEvent e) {
-//				showMenu((ToolItem) e.widget);
-//			}
-//		});
-//		menuTB.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-//			@Override
-//			public void getName(AccessibleEvent e) {
-//				if (e.childID != ACC.CHILDID_SELF) {
-//					Accessible accessible = (Accessible) e.getSource();
-//					ToolBar toolBar = (ToolBar) accessible.getControl();
-//					if (0 <= e.childID && e.childID < toolBar.getItemCount()) {
-//						ToolItem item = toolBar.getItem(e.childID);
-//						if (item != null) {
-//							e.result = item.getToolTipText();
-//						}
-//					}
-//				}
-//			}
-//		});
-//
-//		// Set an initial bounds
-//		trComp.pack();
+		Composite trComp = new Composite(ctf, SWT.NONE);
+		trComp.setBackground(Display.getCurrent().getSystemColor(
+				SWT.COLOR_DARK_CYAN));
+		RowLayout rl = new RowLayout();
+		trComp.setLayout(rl);
+		rl.marginBottom = rl.marginTop = rl.marginRight = rl.marginLeft = 0;
+		ctf.setTopRight(trComp, SWT.RIGHT /* FIXME RAP NOT SUPPORTED | SWT.WRAP */);
+
+		// Initially it's not visible
+		trComp.setVisible(false);
+
+		// Create a TB for the view's drop-down menu
+		ToolBar menuTB = new ToolBar(trComp, SWT.FLAT | SWT.RIGHT);
+		menuTB.setData(TAG_VIEW_MENU);
+		RowData rd = new RowData();
+		menuTB.setLayoutData(rd);
+		ToolItem ti = new ToolItem(menuTB, SWT.PUSH);
+		ti.setImage(getViewMenuImage());
+		ti.setHotImage(null);
+		ti.setToolTipText(SWTRenderersMessages.viewMenu);
+
+		// Initially it's not visible
+		rd.exclude = true;
+		menuTB.setVisible(false);
+
+		ti.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				showMenu((ToolItem) e.widget);
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				showMenu((ToolItem) e.widget);
+			}
+		});
+		// menuTB.getAccessible().addAccessibleListener(new AccessibleAdapter()
+		// {
+		// @Override
+		// public void getName(AccessibleEvent e) {
+		// if (e.childID != ACC.CHILDID_SELF) {
+		// Accessible accessible = (Accessible) e.getSource();
+		// ToolBar toolBar = (ToolBar) accessible.getControl();
+		// if (0 <= e.childID && e.childID < toolBar.getItemCount()) {
+		// ToolItem item = toolBar.getItem(e.childID);
+		// if (item != null) {
+		// e.result = item.getToolTipText();
+		// }
+		// }
+		// }
+		// }
+		// });
+
+		// Set an initial bounds
+		trComp.pack();
 	}
 
 	boolean adjusting = false;
 
 	public void adjustTopRight(final CTabFolder ctf) {
-//FIXME RAP unsupported
-//		if (adjusting)
-//			return;
-//
-//		adjusting = true;
-//
-//		try {
-//			// Gather the parameters...old part, new part...
-//			MPartStack stack = (MPartStack) ctf.getData(OWNING_ME);
-//			MUIElement element = stack.getSelectedElement();
-//			MPart curPart = (MPart) ctf.getTopRight().getData(THE_PART_KEY);
-//			MPart part = null;
-//			if (element != null) {
-//				part = (MPart) ((element instanceof MPart) ? element
-//						: ((MPlaceholder) element).getRef());
-//			}
-//
-//			// Hide the old TB if we're changing
-//			if (part != curPart && curPart != null
-//					&& curPart.getToolbar() != null) {
-//				curPart.getToolbar().setVisible(false);
-//			}
-//
-//			Composite trComp = (Composite) ctf.getTopRight();
-//			Control[] kids = trComp.getChildren();
-//
-//			boolean needsTB = part != null && part.getToolbar() != null
-//					&& part.getToolbar().isToBeRendered();
-//
-//			// View menu (if any)
-//			MMenu viewMenu = getViewMenu(part);
-//			boolean needsMenu = viewMenu != null
-//					&& hasVisibleMenuItems(viewMenu, part);
-//
-//			// Check the current state of the TB's
-//			ToolBar menuTB = (ToolBar) kids[kids.length - 1];
-//
-//			// We need to modify the 'exclude' bit based on if the menuTB is
-//			// visible or not
-//			RowData rd = (RowData) menuTB.getLayoutData();
-//			if (needsMenu) {
-//				menuTB.getItem(0).setData(THE_PART_KEY, part);
-//				menuTB.moveBelow(null);
-//				menuTB.pack();
-//				rd.exclude = false;
-//				menuTB.setVisible(true);
-//			} else {
-//				menuTB.getItem(0).setData(THE_PART_KEY, null);
-//				rd.exclude = true;
-//				menuTB.setVisible(false);
-//			}
-//
-//			ToolBar newViewTB = null;
-//			if (needsTB && part != null && part.getObject() != null) {
-//				part.getToolbar().setVisible(true);
-//				newViewTB = (ToolBar) renderer.createGui(part.getToolbar(),
-//						ctf.getTopRight(), part.getContext());
-//				// We can get calls during shutdown in which case the
-//				// rendering engine will return 'null' because you can't
-//				// render anything while a removeGui is taking place...
-//				if (newViewTB == null) {
-//					adjusting = false;
-//					return;
-//				}
-//				newViewTB.moveAbove(null);
-//				newViewTB.pack();
-//			}
-//
-//			if (needsMenu || needsTB) {
-//				ctf.getTopRight().setData(THE_PART_KEY, part);
-//				ctf.getTopRight().pack(true);
-//				ctf.getTopRight().setVisible(true);
-//			} else {
-//				ctf.getTopRight().setData(THE_PART_KEY, null);
-//				ctf.getTopRight().setVisible(false);
-//			}
-//
-//			// Pack the result
-//			trComp.pack();
-//		} finally {
-//			adjusting = false;
-//		}
+		if (adjusting)
+			return;
+
+		adjusting = true;
+
+		try {
+			// Gather the parameters...old part, new part...
+			MPartStack stack = (MPartStack) ctf.getData(OWNING_ME);
+			MUIElement element = stack.getSelectedElement();
+			MPart curPart = (MPart) ctf.getTopRight().getData(THE_PART_KEY);
+			MPart part = null;
+			if (element != null) {
+				part = (MPart) ((element instanceof MPart) ? element
+						: ((MPlaceholder) element).getRef());
+			}
+
+			// Hide the old TB if we're changing
+			if (part != curPart && curPart != null
+					&& curPart.getToolbar() != null) {
+				// RCP does reparenting curPart.getToolbar().setVisible(false);
+				Control c = (Control) curPart.getToolbar().getWidget();
+				c.setVisible(false);
+				RowData rd = (RowData) c.getLayoutData();
+				rd.exclude = true;
+			}
+
+			Composite trComp = (Composite) ctf.getTopRight();
+			Control[] kids = trComp.getChildren();
+
+			boolean needsTB = part != null && part.getToolbar() != null
+					&& part.getToolbar().isToBeRendered();
+
+			// View menu (if any)
+			MMenu viewMenu = getViewMenu(part);
+			boolean needsMenu = viewMenu != null
+					&& hasVisibleMenuItems(viewMenu, part);
+
+			// Check the current state of the TB's
+			ToolBar menuTB = (ToolBar) kids[kids.length - 1];
+
+			// We need to modify the 'exclude' bit based on if the menuTB is
+			// visible or not
+			RowData rd = (RowData) menuTB.getLayoutData();
+			if (needsMenu) {
+				menuTB.getItem(0).setData(THE_PART_KEY, part);
+				menuTB.moveBelow(null);
+				menuTB.pack();
+				rd.exclude = false;
+				menuTB.setVisible(true);
+			} else {
+				menuTB.getItem(0).setData(THE_PART_KEY, null);
+				rd.exclude = true;
+				menuTB.setVisible(false);
+			}
+
+			ToolBar newViewTB = null;
+			if (needsTB && part != null && part.getObject() != null) {
+				// RCP does reparenting part.getToolbar().setVisible(true);
+				newViewTB = (ToolBar) renderer.createGui(part.getToolbar(),
+						ctf.getTopRight(), part.getContext());
+				if (newViewTB != null) {
+					RowData rowData = (RowData) newViewTB.getLayoutData();
+					if (rowData == null) {
+						rowData = new RowData();
+						newViewTB.setLayoutData(rowData);
+					} else {
+						rowData.exclude = false;
+						newViewTB.setVisible(true);
+					}
+				}
+
+				// We can get calls during shutdown in which case the
+				// rendering engine will return 'null' because you can't
+				// render anything while a removeGui is taking place...
+				if (newViewTB == null) {
+					adjusting = false;
+					return;
+				}
+				newViewTB.moveAbove(null);
+				newViewTB.pack();
+			}
+
+			if (needsMenu || needsTB) {
+				ctf.getTopRight().setData(THE_PART_KEY, part);
+				ctf.getTopRight().pack(true);
+				ctf.getTopRight().setVisible(true);
+			} else {
+				ctf.getTopRight().setData(THE_PART_KEY, null);
+				ctf.getTopRight().setVisible(false);
+			}
+
+			// Pack the result
+			trComp.pack();
+		} finally {
+			adjusting = false;
+		}
 	}
 
 	@Override
@@ -1296,48 +1315,15 @@ public class StackRenderer extends LazyStackRenderer {
 			swtMenu.dispose();
 		}
 	}
-//FIXME RAP unsupported
-//	private Image getViewMenuImage() {
-//		if (viewMenuImage == null) {
-//			Display d = Display.getCurrent();
-//
-//			Image viewMenu = new Image(d, 16, 16);
-//			Image viewMenuMask = new Image(d, 16, 16);
-//
-//			Display display = Display.getCurrent();
-//			GC gc = new GC(viewMenu);
-//			GC maskgc = new GC(viewMenuMask);
-//			gc.setForeground(display
-//					.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
-//			gc.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-//
-//			int[] shapeArray = new int[] { 6, 3, 15, 3, 11, 7, 10, 7 };
-//			gc.fillPolygon(shapeArray);
-//			gc.drawPolygon(shapeArray);
-//
-//			Color black = display.getSystemColor(SWT.COLOR_BLACK);
-//			Color white = display.getSystemColor(SWT.COLOR_WHITE);
-//
-//			maskgc.setBackground(black);
-//			maskgc.fillRectangle(0, 0, 16, 16);
-//
-//			maskgc.setBackground(white);
-//			maskgc.setForeground(white);
-//			maskgc.fillPolygon(shapeArray);
-//			maskgc.drawPolygon(shapeArray);
-//			gc.dispose();
-//			maskgc.dispose();
-//
-//			ImageData data = viewMenu.getImageData();
-//			data.transparentPixel = data.getPixel(0, 0);
-//
-//			viewMenuImage = new Image(d, viewMenu.getImageData(),
-//					viewMenuMask.getImageData());
-//			viewMenu.dispose();
-//			viewMenuMask.dispose();
-//		}
-//		return viewMenuImage;
-//	}
+
+	private Image getViewMenuImage() {
+		if (viewMenuImage == null) {
+			viewMenuImage = new Image(Display.getCurrent(), getClass()
+					.getClassLoader()
+					.getResourceAsStream("/icons/viewMenu.png")); //$NON-NLS-1$
+		}
+		return viewMenuImage;
+	}
 
 	private void openMenuFor(MPart part, CTabFolder folder, Point point) {
 		Menu tabMenu = createTabMenu(folder, part);
@@ -1540,67 +1526,67 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 		return null;
 	}
-//FIXME RAP unsupported
-//	/**
-//	 * Determine whether the given view menu has any visible menu items.
-//	 * 
-//	 * @param viewMenu
-//	 *            the view menu to check
-//	 * @param part
-//	 *            the view menu's parent part
-//	 * @return <tt>true</tt> if the specified view menu has visible children,
-//	 *         <tt>false</tt> otherwise
-//	 */
-//	private boolean hasVisibleMenuItems(MMenu viewMenu, MPart part) {
-//		if (!viewMenu.isToBeRendered() || !viewMenu.isVisible()) {
-//			return false;
-//		}
-//
-//		for (MMenuElement menuElement : viewMenu.getChildren()) {
-//			if (menuElement.isToBeRendered() && menuElement.isVisible()) {
-//				if (OpaqueElementUtil.isOpaqueMenuItem(menuElement)
-//						|| OpaqueElementUtil.isOpaqueMenuSeparator(menuElement)) {
-//					IContributionItem item = (IContributionItem) OpaqueElementUtil
-//							.getOpaqueItem(menuElement);
-//					if (item != null && item.isVisible()) {
-//						return true;
-//					}
-//				} else {
-//					return true;
-//				}
-//			}
-//		}
-//
-//		Object menuRenderer = viewMenu.getRenderer();
-//		if (menuRenderer instanceof MenuManagerRenderer) {
-//			MenuManager manager = ((MenuManagerRenderer) menuRenderer)
-//					.getManager(viewMenu);
-//			if (manager != null && manager.isVisible()) {
-//				return true;
-//			}
-//		}
-//
-//		Control control = (Control) part.getWidget();
-//		if (control != null) {
-//			Menu menu = (Menu) renderer.createGui(viewMenu, control.getShell(),
-//					part.getContext());
-//			if (menu != null) {
-//				menuRenderer = viewMenu.getRenderer();
-//				if (menuRenderer instanceof MenuManagerRenderer) {
-//					MenuManagerRenderer menuManagerRenderer = (MenuManagerRenderer) menuRenderer;
-//					MenuManager manager = menuManagerRenderer
-//							.getManager(viewMenu);
-//					if (manager != null) {
-//						// remark ourselves as dirty so that the menu will be
-//						// reconstructed
-//						manager.markDirty();
-//					}
-//				}
-//				return menu.getItemCount() != 0;
-//			}
-//		}
-//		return false;
-//	}
+
+	/**
+	 * Determine whether the given view menu has any visible menu items.
+	 * 
+	 * @param viewMenu
+	 *            the view menu to check
+	 * @param part
+	 *            the view menu's parent part
+	 * @return <tt>true</tt> if the specified view menu has visible children,
+	 *         <tt>false</tt> otherwise
+	 */
+	private boolean hasVisibleMenuItems(MMenu viewMenu, MPart part) {
+		if (!viewMenu.isToBeRendered() || !viewMenu.isVisible()) {
+			return false;
+		}
+
+		for (MMenuElement menuElement : viewMenu.getChildren()) {
+			if (menuElement.isToBeRendered() && menuElement.isVisible()) {
+				if (OpaqueElementUtil.isOpaqueMenuItem(menuElement)
+						|| OpaqueElementUtil.isOpaqueMenuSeparator(menuElement)) {
+					IContributionItem item = (IContributionItem) OpaqueElementUtil
+							.getOpaqueItem(menuElement);
+					if (item != null && item.isVisible()) {
+						return true;
+					}
+				} else {
+					return true;
+				}
+			}
+		}
+
+		Object menuRenderer = viewMenu.getRenderer();
+		if (menuRenderer instanceof MenuManagerRenderer) {
+			MenuManager manager = ((MenuManagerRenderer) menuRenderer)
+					.getManager(viewMenu);
+			if (manager != null && manager.isVisible()) {
+				return true;
+			}
+		}
+
+		Control control = (Control) part.getWidget();
+		if (control != null) {
+			Menu menu = (Menu) renderer.createGui(viewMenu, control.getShell(),
+					part.getContext());
+			if (menu != null) {
+				menuRenderer = viewMenu.getRenderer();
+				if (menuRenderer instanceof MenuManagerRenderer) {
+					MenuManagerRenderer menuManagerRenderer = (MenuManagerRenderer) menuRenderer;
+					MenuManager manager = menuManagerRenderer
+							.getManager(viewMenu);
+					if (manager != null) {
+						// remark ourselves as dirty so that the menu will be
+						// reconstructed
+						manager.markDirty();
+					}
+				}
+				return menu.getItemCount() != 0;
+			}
+		}
+		return false;
+	}
 
 	@SuppressWarnings("javadoc")
 	public class TabStateHandler implements EventHandler {
