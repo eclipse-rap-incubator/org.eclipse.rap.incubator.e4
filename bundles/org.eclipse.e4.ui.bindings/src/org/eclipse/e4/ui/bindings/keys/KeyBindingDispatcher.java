@@ -67,6 +67,10 @@ public class KeyBindingDispatcher {
 	public final class KeyDownFilter implements Listener {
 
 		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		/**
 		 * Whether the filter is enabled.
 		 */
 		private transient boolean enabled = true;

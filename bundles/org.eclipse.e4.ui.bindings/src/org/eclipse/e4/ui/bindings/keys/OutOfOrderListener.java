@@ -24,6 +24,11 @@ import org.eclipse.swt.widgets.Widget;
  */
 final class OutOfOrderListener implements Listener {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The time at which this listener was last registered to an event. This is the
 	 * <code>event.time</code> value.
 	 * 

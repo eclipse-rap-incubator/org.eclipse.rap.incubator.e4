@@ -24,6 +24,10 @@ import org.eclipse.swt.widgets.Widget;
 final class CancelOnModifyListener implements Listener {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * The listener to remove when this listener catches any event. This value should not be
 	 * <code>null</code>.
 	 */

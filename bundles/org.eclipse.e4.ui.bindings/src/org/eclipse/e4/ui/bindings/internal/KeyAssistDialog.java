@@ -55,6 +55,11 @@ import org.eclipse.swt.widgets.TableItem;
 public class KeyAssistDialog extends PopupDialog {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The data key for the binding stored on an SWT widget. The key is a fully-qualified name, but
 	 * in reverse order. This is so that the equals method will detect misses faster.
 	 */
@@ -356,6 +361,11 @@ public class KeyAssistDialog extends PopupDialog {
 		 * If you double-click on the table, it should execute the selected command.
 		 */
 		completionsTable.addListener(SWT.DefaultSelection, new Listener() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void handleEvent(Event event) {
 				executeKeyBinding(event);
