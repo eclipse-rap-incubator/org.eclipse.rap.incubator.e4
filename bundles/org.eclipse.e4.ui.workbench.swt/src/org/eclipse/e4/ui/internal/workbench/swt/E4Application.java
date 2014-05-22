@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.UUID;
 import org.eclipse.core.databinding.observable.Realm;
@@ -555,7 +554,7 @@ public class E4Application implements IApplication {
 		});
 
 		// translation
-		String locale = Locale.getDefault().toString();
+		String locale = RWT.getLocale().toString();
 		appContext.set(TranslationService.LOCALE, locale);
 		TranslationService bundleTranslationProvider = TranslationProviderFactory
 				.bundleTranslationService(appContext);
