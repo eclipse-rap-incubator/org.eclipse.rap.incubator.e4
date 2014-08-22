@@ -35,9 +35,9 @@
 
 	<repositories>
 		<repository>
-			<id>luna-i-build</id>
+			<id>eclipse-platform-4.4</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/eclipse/updates/4.4-I-builds</url>
+			<url>http://download.eclipse.org/eclipse/updates/4.4</url>
 		</repository>
 	</repositories>
 
