@@ -31,21 +31,21 @@
 	</modules>
 
 	<repositories>
-		<!--  repository>
+		<repository>
 			<id>luna</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/releases/luna</url>
-		</repository-->
+		</repository>
 		<repository>
 			<id>rap-nightly</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/rt/rap/nightly/runtime/</url>
 		</repository>
-		<repository>
+		<!--  repository>
 			<id>luna-i-build</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/eclipse/updates/4.4-I-builds</url>
-		</repository>
+		</repository-->
 	</repositories>
 
 	<pluginRepositories>
@@ -88,7 +88,7 @@
  					</execution>
  				</executions>
 			</plugin>
-		
+
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
