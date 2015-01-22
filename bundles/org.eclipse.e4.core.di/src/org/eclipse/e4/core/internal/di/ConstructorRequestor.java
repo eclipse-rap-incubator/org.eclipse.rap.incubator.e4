@@ -47,6 +47,9 @@ public class ConstructorRequestor extends Requestor<Constructor<?>> {
 			throw new InjectionException(e);
 		} catch (InvocationTargetException e) {
 			Throwable originalException = e.getCause();
+			if (originalException instanceof Error) {
+				throw (Error) originalException;
+			}
 			throw new InjectionException((originalException != null) ? originalException : e);
 		} finally {
 			if (!wasAccessible)
