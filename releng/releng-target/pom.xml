@@ -26,7 +26,9 @@
 	</properties>
 
 	<modules>
+		<module>../../bundles/org.eclipse.e4.core.commands</module>
 		<module>../../bundles/org.eclipse.e4.ui.bindings</module>
+		<module>../../bundles/org.eclipse.e4.ui.workbench</module>
 		<module>../../bundles/org.eclipse.e4.ui.workbench.addons.swt</module>
 		<module>../../bundles/org.eclipse.e4.ui.workbench.renderers.swt</module>
 		<module>../../bundles/org.eclipse.e4.ui.workbench.swt</module>

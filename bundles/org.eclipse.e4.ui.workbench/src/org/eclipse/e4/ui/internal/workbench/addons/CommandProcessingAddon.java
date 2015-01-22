@@ -26,6 +26,7 @@ import org.eclipse.core.commands.ParameterType;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.Parameter;
@@ -65,6 +66,13 @@ public class CommandProcessingAddon {
 	private EventHandler additionHandler;
 
 	private ICommandManagerListener cmListener;
+
+	private final IEclipseContext context;
+
+	@Inject
+	public CommandProcessingAddon(IEclipseContext context) {
+		this.context = context;
+	}
 
 	/**
 	 * @param cmd
@@ -158,7 +166,7 @@ public class CommandProcessingAddon {
 						final Command command = commandManagerEvent.getCommandManager().getCommand(
 								commandId);
 						if (command.getHandler() == null) {
-							command.setHandler(HandlerServiceImpl.getHandler(commandId));
+							command.setHandler(HandlerServiceImpl.getHandler(commandId, context));
 						}
 						try {
 							MCategory categoryModel = findCategory(command.getCategory().getId());
@@ -247,7 +255,7 @@ public class CommandProcessingAddon {
 	/**
 	 * Attempt to localize the provided key. Return the localized variant if found or the key itself
 	 * otherwise.
-	 * 
+	 *
 	 * @param key
 	 *            the possible key reference
 	 * @param modelElement

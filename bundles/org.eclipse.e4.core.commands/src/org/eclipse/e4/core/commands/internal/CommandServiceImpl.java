@@ -19,6 +19,7 @@ import org.eclipse.core.commands.CommandManager;
 import org.eclipse.core.commands.IParameter;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.e4.core.commands.ECommandService;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 
 /**
  *
@@ -26,10 +27,12 @@ import org.eclipse.e4.core.commands.ECommandService;
 public class CommandServiceImpl implements ECommandService {
 
 	private CommandManager commandManager;
+	private IEclipseContext context;
 
 	@Inject
-	public void setManager(CommandManager m) {
+	public void setManager(CommandManager m, IEclipseContext c) {
 		commandManager = m;
+		context = c;
 	}
 
 	@Override
@@ -56,7 +59,7 @@ public class CommandServiceImpl implements ECommandService {
 		Command cmd = commandManager.getCommand(id);
 		if (!cmd.isDefined()) {
 			cmd.define(name, description, category, parameters);
-			cmd.setHandler(HandlerServiceImpl.getHandler(id));
+			cmd.setHandler(HandlerServiceImpl.getHandler(id, context));
 		}
 		return cmd;
 	}

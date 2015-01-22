@@ -33,14 +33,16 @@ public class HandlerServiceHandler extends AbstractHandler {
 
 	private static final String FAILED_TO_FIND_HANDLER_DURING_EXECUTION = "Failed to find handler during execution"; //$NON-NLS-1$
 	protected String commandId;
+	private IEclipseContext context;
 
-	public HandlerServiceHandler(String commandId) {
+	public HandlerServiceHandler(String commandId, IEclipseContext context) {
 		this.commandId = commandId;
+		this.context = context;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		ExecutionContexts contexts = HandlerServiceImpl.peek();
+		ExecutionContexts contexts = HandlerServiceImpl.peek(context);
 		// setEnabled(contexts);
 		IEclipseContext executionContext = contexts != null ? contexts.context : null; // getExecutionContext(contexts);
 		if (executionContext == null) {
@@ -82,7 +84,7 @@ public class HandlerServiceHandler extends AbstractHandler {
 	}
 
 	private IEclipseContext getStaticContext(IEclipseContext executionContext) {
-		final ExecutionContexts pair = HandlerServiceImpl.peek();
+		final ExecutionContexts pair = HandlerServiceImpl.peek(context);
 		if (pair != null) {
 			if (pair.context != executionContext) {
 				// log this
@@ -105,7 +107,7 @@ public class HandlerServiceHandler extends AbstractHandler {
 		if (evalObj instanceof IEvaluationContext) {
 			return getExecutionContext(((IEvaluationContext) evalObj).getParent());
 		}
-		final ExecutionContexts pair = HandlerServiceImpl.peek();
+		final ExecutionContexts pair = HandlerServiceImpl.peek(context);
 		if (pair != null) {
 			return pair.context;
 		}
@@ -114,7 +116,7 @@ public class HandlerServiceHandler extends AbstractHandler {
 
 	@Override
 	public boolean isHandled() {
-		ExecutionContexts contexts = HandlerServiceImpl.peek();
+		ExecutionContexts contexts = HandlerServiceImpl.peek(context);
 		if (contexts != null) {
 			Object handler = HandlerServiceImpl.lookUpHandler(contexts.context, commandId);
 			if (handler instanceof IHandler) {
