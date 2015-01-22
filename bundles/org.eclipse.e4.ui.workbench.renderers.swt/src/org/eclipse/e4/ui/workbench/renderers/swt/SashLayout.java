@@ -15,11 +15,16 @@ import java.util.List;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 
 public class SashLayout extends Layout {
@@ -60,7 +65,7 @@ public class SashLayout extends Layout {
 	public SashLayout(final Composite host, MUIElement root) {
 		this.root = root;
 		this.host = host;
-		// FIXME RAP does not support this
+		// RAP does not support mouse track/move listeners
 		// host.addMouseTrackListener(new MouseTrackListener() {
 		// @Override
 		// public void mouseHover(MouseEvent e) {
@@ -171,7 +176,59 @@ public class SashLayout extends Layout {
 
 		sashes.clear();
 		tileSubNodes(bounds, root);
+		// RAP: Use real Sash widgets instead of mouse track/move listeners
+		updateSashWidgets();
+		// RAPEND
 	}
+
+	// RAP: Use real Sash widgets instead of mouse track/move listeners
+	List<Sash> sashWidgets = new ArrayList<Sash>();
+
+	private void updateSashWidgets() {
+		for (int i = 0; i < sashes.size(); i++) {
+			SashRect sashRect = sashes.get(i);
+			if (i < sashWidgets.size()) {
+				Sash sashWidget = sashWidgets.get(i);
+				if (isSameOrientation(sashWidget, sashRect)) {
+					sashWidget.setBounds(sashRect.rect);
+				} else {
+					sashWidgets.set(i, createSash(sashRect)).dispose();
+				}
+			} else {
+				sashWidgets.add(createSash(sashRect));
+			}
+		}
+		while (sashWidgets.size() > sashes.size()) {
+			sashWidgets.remove(sashWidgets.size() - 1).dispose();
+		}
+	}
+
+	private Sash createSash(final SashRect sashRect) {
+		boolean horizontal = !sashRect.container.isHorizontal();
+		Sash sash = new Sash(host, horizontal ? SWT.HORIZONTAL : SWT.VERTICAL);
+		sash.setBounds(sashRect.rect);
+		sash.addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				Display display = host.getDisplay();
+				Point cursorLocation = display.getCursorLocation();
+				Point mapped = display.map(null, host, cursorLocation);
+				sashesToDrag = new ArrayList<SashLayout.SashRect>();
+				sashesToDrag.add(sashRect);
+				adjustWeights(sashesToDrag, mapped.x, mapped.y);
+				host.layout();
+				host.update();
+			}
+		});
+		return sash;
+	}
+
+	private boolean isSameOrientation(Sash sash, SashRect sashRect) {
+		boolean isSashHorizontal = (sash.getStyle() & SWT.HORIZONTAL) != 0;
+		boolean isSashContainerHorizontal = sashRect.container.isHorizontal();
+		return isSashHorizontal != isSashContainerHorizontal;
+	}
+	// RAPEND
 
 	protected void adjustWeights(List<SashRect> sashes, int curX, int curY) {
 		for (SashRect sr : sashes) {

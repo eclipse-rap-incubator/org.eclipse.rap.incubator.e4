@@ -31,7 +31,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
-import org.eclipse.e4.ui.workbench.renderers.swt.rap.RAPSashRenderer;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 
 public class WorkbenchRendererFactory implements IRendererFactory {
@@ -45,12 +44,11 @@ public class WorkbenchRendererFactory implements IRendererFactory {
 	private ElementReferenceRenderer elementRefRenderer;
 	private PerspectiveStackRenderer perspStackRenderer;
 	private PerspectiveRenderer perspRenderer;
-	// private SashRenderer partSashRenderer;
+	private SashRenderer partSashRenderer;
 	private LazyStackRenderer stackRenderer;
 	private TrimBarRenderer trimBarRenderer;
 	private ToolControlRenderer toolControlRenderer;
 	private WBWRenderer wbwRenderer;
-	private RAPSashRenderer rapSashRenderer;
 
 	private IEclipseContext context;
 
@@ -108,16 +106,11 @@ public class WorkbenchRendererFactory implements IRendererFactory {
 			}
 			return perspStackRenderer;
 		} else if (uiElement instanceof MPartSashContainer) {
-			if (rapSashRenderer == null) {
-				rapSashRenderer = new RAPSashRenderer();
-				initRenderer(rapSashRenderer);
+			if (partSashRenderer == null) {
+				partSashRenderer = new SashRenderer();
+				initRenderer(partSashRenderer);
 			}
-			return rapSashRenderer;
-			// if (partSashRenderer == null) {
-			// partSashRenderer = new SashRenderer();
-			// initRenderer(partSashRenderer);
-			// }
-			// return partSashRenderer;
+			return partSashRenderer;
 		} else if (uiElement instanceof MPartStack) {
 			if (stackRenderer == null) {
 				stackRenderer = new StackRenderer();
