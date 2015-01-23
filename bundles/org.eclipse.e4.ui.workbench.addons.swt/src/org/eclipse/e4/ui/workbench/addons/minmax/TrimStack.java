@@ -121,7 +121,7 @@ public class TrimStack {
 
 	ControlListener caResizeListener = new ControlListener() {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 
@@ -139,7 +139,7 @@ public class TrimStack {
 	// Listens to ESC and closes the active fast view
 	private Listener escapeListener = new Listener() {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 
@@ -222,7 +222,7 @@ public class TrimStack {
 	/**
 	 * This is the new way to handle UIEvents (as opposed to subscring and unsubscribing them with
 	 * the event broker.
-	 * 
+	 *
 	 * The method is described in detail at http://wiki.eclipse.org/Eclipse4/RCP/Event_Model
 	 */
 	@SuppressWarnings("unchecked")
@@ -302,7 +302,7 @@ public class TrimStack {
 			showStack(false);
 		}
 	};
-	
+
 	// Close any open stacks before shutting down
 	private EventHandler shutdownHandler = new EventHandler() {
 		@Override
@@ -498,7 +498,7 @@ public class TrimStack {
 	// appropriate part.
 	private SelectionListener toolItemSelectionListener = new SelectionListener() {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1L;
 
@@ -594,7 +594,7 @@ public class TrimStack {
 		trimStackTB = new ToolBar(parent, orientation | SWT.FLAT | SWT.WRAP);
 		trimStackTB.addDisposeListener(new DisposeListener() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -609,7 +609,7 @@ public class TrimStack {
 
 		trimStackTB.addListener(SWT.MenuDetect, new Listener() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -652,7 +652,7 @@ public class TrimStack {
 		restoreBtn.setImage(getRestoreImage());
 		restoreBtn.addSelectionListener(new SelectionAdapter() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -673,7 +673,7 @@ public class TrimStack {
 		restoreItem.setText(Messages.TrimStack_RestoreText);
 		restoreItem.addListener(SWT.Selection, new Listener() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -693,7 +693,7 @@ public class TrimStack {
 		useOverlaysItem.setSelection(!useOverlays());
 		useOverlaysItem.addListener(SWT.Selection, new Listener() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -712,7 +712,7 @@ public class TrimStack {
 	 * layout tags on the {@link #minimizedElement}. The restore item will remove the minimized tag.
 	 * The close item is not available on the editor stack, but will ask the part service to hide
 	 * the part.
-	 * 
+	 *
 	 * @param selectedPart
 	 *            the part from the data of the selected tool item
 	 */
@@ -726,7 +726,7 @@ public class TrimStack {
 		defaultItem.setText(Messages.TrimStack_DefaultOrientationItem);
 		defaultItem.addListener(SWT.Selection, new Listener() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -746,7 +746,7 @@ public class TrimStack {
 		horizontalItem.setText(Messages.TrimStack_Horizontal);
 		horizontalItem.addListener(SWT.Selection, new Listener() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -767,7 +767,7 @@ public class TrimStack {
 		verticalItem.setText(Messages.TrimStack_Vertical);
 		verticalItem.addListener(SWT.Selection, new Listener() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -796,7 +796,7 @@ public class TrimStack {
 		restoreItem.setText(Messages.TrimStack_RestoreText);
 		restoreItem.addListener(SWT.Selection, new Listener() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -813,7 +813,7 @@ public class TrimStack {
 			closeItem.setText(Messages.TrimStack_CloseText);
 			closeItem.addListener(SWT.Selection, new Listener() {
 				/**
-				 * 
+				 *
 				 */
 				private static final long serialVersionUID = 1L;
 
@@ -987,7 +987,7 @@ public class TrimStack {
 
 	/**
 	 * Sets whether this stack should be visible or hidden
-	 * 
+	 *
 	 * @param show
 	 *            whether the stack should be visible
 	 */
@@ -999,7 +999,7 @@ public class TrimStack {
 			return;
 
 		if (show && !isShowing) {
-			if (useOverlays()) {
+			if (useOverlays() && false) {
 				hostPane = getHostPane();
 				originalParent = ctrl.getParent();
 				ctrl.setParent(hostPane);
@@ -1178,7 +1178,7 @@ public class TrimStack {
 
 		hostPane.addDisposeListener(new DisposeListener() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 
