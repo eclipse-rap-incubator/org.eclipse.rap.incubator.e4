@@ -173,7 +173,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 						Composite realComp = (Composite) renderer
 								.getUIContainer(changedElement);
 						Control ctrl = (Control) changedElement.getWidget();
-						ctrl.setParent(realComp);
+// RAP: re-parenting not supported
+//						ctrl.setParent(realComp);
+						ctrl.setVisible(true);
 						fixZOrder(changedElement);
 					}
 
@@ -193,7 +195,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 								SWT.DEFER);
 					}
 
-					ctrl.setParent(getLimboShell());
+// RAP: re-parenting not supported
+//					ctrl.setParent(getLimboShell());
+					ctrl.setVisible(false);
 				}
 
 				if (parent instanceof MElementContainer<?>) {
