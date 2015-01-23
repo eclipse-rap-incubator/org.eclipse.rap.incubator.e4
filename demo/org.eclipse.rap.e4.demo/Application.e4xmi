@@ -1,31 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_-j-GgKBNEeODEs7-bWqIxA" elementId="org.eclipse.e4.ide.application" bindingContexts="_-j-tkKBNEeODEs7-bWqIxA">
   <children xsi:type="basic:TrimmedWindow" xmi:id="_-j-GgaBNEeODEs7-bWqIxA" label="%trimmedwindow.label.1" width="500" height="400">
-    <children xsi:type="basic:PartSashContainer" xmi:id="_FPvvQKCAEeOCJ5u74o02rg" elementId="org.eclipse.rap.e4.demo.partsashcontainer.0" horizontal="true">
-      <children xsi:type="basic:PartStack" xmi:id="_8eKmwKJKEeSZFtDwdo07Rg" elementId="org.eclipse.rap.e4.demo.partstack.1" containerData="100">
-        <children xsi:type="basic:Part" xmi:id="_FzadAKCAEeOCJ5u74o02rg" elementId="org.eclipse.rap.e4.demo.part.0" containerData="100" label="Empty Left"/>
+    <children xsi:type="basic:PartSashContainer" xmi:id="_5fAc0KLgEeSGUftsJTPCBQ" elementId="org.eclipse.rap.e4.demo.partsashcontainer.2">
+      <children xsi:type="basic:PartSashContainer" xmi:id="_FPvvQKCAEeOCJ5u74o02rg" elementId="org.eclipse.rap.e4.demo.partsashcontainer.0" containerData="100" horizontal="true">
+        <children xsi:type="basic:PartStack" xmi:id="_8eKmwKJKEeSZFtDwdo07Rg" elementId="org.eclipse.rap.e4.demo.partstack.1" containerData="100">
+          <children xsi:type="basic:Part" xmi:id="_FzadAKCAEeOCJ5u74o02rg" elementId="org.eclipse.rap.e4.demo.part.0" containerData="100" label="Empty Left"/>
+        </children>
+        <children xsi:type="basic:PartStack" xmi:id="_M-uNIKCAEeOCJ5u74o02rg" elementId="org.eclipse.rap.e4.demo.partstack.0" containerData="300">
+          <children xsi:type="basic:Part" xmi:id="_GwxdIKCAEeOCJ5u74o02rg" elementId="org.eclipse.rap.e4.demo.part.1" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.parts.EventSamplePart" label="%part.label.1">
+            <toolbar xmi:id="_HHjAcOGREeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.toolbar.1">
+              <children xsi:type="menu:DirectToolItem" xmi:id="_Hh9EgOGREeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.directtoolitem.1" label="%directtoolitem.label.1" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.handlers.HelloWorldHandler"/>
+            </toolbar>
+          </children>
+          <children xsi:type="basic:Part" xmi:id="_rk6l0KhAEeO0Haj3z6o3PQ" elementId="org.eclipse.rap.e4.demo.part.2" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.parts.PreferenceSamplePart" label="%part.label.2">
+            <menus xmi:id="_EIg8IOGUEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.menu.2">
+              <tags>ViewMenu</tags>
+              <children xsi:type="menu:DirectMenuItem" xmi:id="_HAt4UOGUEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.directmenuitem.1" label="%directmenuitem.label.2" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.handlers.HelloWorldHandler"/>
+            </menus>
+          </children>
+          <children xsi:type="basic:Part" xmi:id="_JBUKsKhHEeO0Haj3z6o3PQ" elementId="org.eclipse.rap.e4.demo.part.3" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.parts.NLSSamplePart" label="%part.label.3">
+            <menus xmi:id="_4EurEOGcEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.menu.3">
+              <tags>ViewMenu</tags>
+              <children xsi:type="menu:DirectMenuItem" xmi:id="_4nG_YOGcEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.directmenuitem.2" label="%directmenuitem.label.3" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.handlers.HelloWorldHandler"/>
+            </menus>
+            <toolbar xmi:id="_6O4mwOGiEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.toolbar.2">
+              <tags>ContentArea</tags>
+              <children xsi:type="menu:DirectToolItem" xmi:id="_7pm4UOGiEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.directtoolitem.2" label="%directtoolitem.label.2" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.handlers.HelloWorldHandler"/>
+            </toolbar>
+          </children>
+        </children>
       </children>
-      <children xsi:type="basic:PartStack" xmi:id="_M-uNIKCAEeOCJ5u74o02rg" elementId="org.eclipse.rap.e4.demo.partstack.0" containerData="300">
-        <children xsi:type="basic:Part" xmi:id="_GwxdIKCAEeOCJ5u74o02rg" elementId="org.eclipse.rap.e4.demo.part.1" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.parts.EventSamplePart" label="%part.label.1">
-          <toolbar xmi:id="_HHjAcOGREeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.toolbar.1">
-            <children xsi:type="menu:DirectToolItem" xmi:id="_Hh9EgOGREeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.directtoolitem.1" label="%directtoolitem.label.1" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.handlers.HelloWorldHandler"/>
-          </toolbar>
-        </children>
-        <children xsi:type="basic:Part" xmi:id="_rk6l0KhAEeO0Haj3z6o3PQ" elementId="org.eclipse.rap.e4.demo.part.2" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.parts.PreferenceSamplePart" label="%part.label.2">
-          <menus xmi:id="_EIg8IOGUEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.menu.2">
-            <tags>ViewMenu</tags>
-            <children xsi:type="menu:DirectMenuItem" xmi:id="_HAt4UOGUEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.directmenuitem.1" label="%directmenuitem.label.2" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.handlers.HelloWorldHandler"/>
-          </menus>
-        </children>
-        <children xsi:type="basic:Part" xmi:id="_JBUKsKhHEeO0Haj3z6o3PQ" elementId="org.eclipse.rap.e4.demo.part.3" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.parts.NLSSamplePart" label="%part.label.3">
-          <menus xmi:id="_4EurEOGcEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.menu.3">
-            <tags>ViewMenu</tags>
-            <children xsi:type="menu:DirectMenuItem" xmi:id="_4nG_YOGcEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.directmenuitem.2" label="%directmenuitem.label.3" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.handlers.HelloWorldHandler"/>
-          </menus>
-          <toolbar xmi:id="_6O4mwOGiEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.toolbar.2">
-            <tags>ContentArea</tags>
-            <children xsi:type="menu:DirectToolItem" xmi:id="_7pm4UOGiEeObqJp-_0s5uA" elementId="org.eclipse.rap.e4.demo.directtoolitem.2" label="%directtoolitem.label.2" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.handlers.HelloWorldHandler"/>
-          </toolbar>
+      <children xsi:type="basic:PartSashContainer" xmi:id="_gYBKQKLgEeSGUftsJTPCBQ" elementId="org.eclipse.rap.e4.demo.partsashcontainer.1" containerData="100" horizontal="true">
+        <children xsi:type="basic:Part" xmi:id="_iOPsEKLgEeSGUftsJTPCBQ" elementId="org.eclipse.rap.e4.demo.part.4" containerData="200" contributionURI="bundleclass://org.eclipse.rap.e4.demo/org.eclipse.rap.e4.demo.parts.SimpleTest" label="Simple Lower Part Right"/>
+        <children xsi:type="basic:PartStack" xmi:id="_izBNEKLgEeSGUftsJTPCBQ" elementId="org.eclipse.rap.e4.demo.partstack.2" containerData="400">
+          <children xsi:type="basic:Part" xmi:id="_16In4KLgEeSGUftsJTPCBQ" elementId="org.eclipse.rap.e4.demo.part.5" label="Simple Lower Right"/>
         </children>
       </children>
     </children>
