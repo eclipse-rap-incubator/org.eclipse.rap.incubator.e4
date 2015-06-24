@@ -31,14 +31,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver;
  * window'w 'sharedElementList' if necessary.
  */
 public class PlaceholderResolver implements EPlaceholderResolver {
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver#resolvePlaceholderRef(org.eclipse
-	 * .e4.ui.model.application.ui.advanced.MPlaceholder,
-	 * org.eclipse.e4.ui.model.application.ui.basic.MWindow)
-	 */
+
 	@Override
 	public void resolvePlaceholderRef(MPlaceholder ph, MWindow refWin) {
 		if (ph.getRef() != null)
@@ -67,8 +60,6 @@ public class PlaceholderResolver implements EPlaceholderResolver {
 			// sharedArea.setLabel("Editor Area"); //$NON-NLS-1$
 
 			MPartStack editorStack = BasicFactoryImpl.eINSTANCE.createPartStack();
-			// temporary HACK for bug 303982
-			editorStack.getTags().add("newtablook"); //$NON-NLS-1$
 			editorStack.getTags().add("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$
 			editorStack.getTags().add("EditorStack"); //$NON-NLS-1$
 			editorStack.setElementId("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$

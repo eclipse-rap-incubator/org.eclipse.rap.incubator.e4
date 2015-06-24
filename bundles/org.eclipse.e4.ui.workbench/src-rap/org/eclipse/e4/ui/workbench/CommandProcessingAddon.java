@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
 
-package org.eclipse.e4.ui.internal.workbench.addons;
+package org.eclipse.e4.ui.workbench;
 
 import java.util.ArrayList;
 import java.util.List;
