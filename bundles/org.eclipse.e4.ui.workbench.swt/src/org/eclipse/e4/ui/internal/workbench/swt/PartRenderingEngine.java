@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.eclipse.core.databinding.observable.Realm;
@@ -24,6 +23,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
@@ -74,7 +74,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 //import org.eclipse.ui.testing.TestableObject;
 import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
 
 public class PartRenderingEngine implements IPresentationEngine {
 	public static final String EARLY_STARTUP_HOOK = "runEarlyStartup";
@@ -92,248 +91,252 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	org.eclipse.swt.widgets.Listener keyListener;
 
-	// Life Cycle handlers
-	private EventHandler toBeRenderedHandler = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
+	@Inject
+	@Optional
+	private void subscribeTopicToBeRendered(@EventTopic(UIEvents.UIElement.TOPIC_TOBERENDERED) Event event) {
 
-			MUIElement changedElement = (MUIElement) event
-					.getProperty(UIEvents.EventTags.ELEMENT);
-			MElementContainer<?> parent = changedElement.getParent();
+		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		MElementContainer<?> parent = changedElement.getParent();
 
-			// Handle Detached Windows
-			if (parent == null) {
-				parent = (MElementContainer<?>) ((EObject) changedElement)
-						.eContainer();
-			}
-
-			// menus are not handled here... ??
-			if (parent instanceof MMenu)
-				return;
-
-			// If the parent isn't visible we don't care (The application is
-			// never rendered)
-			boolean okToRender = parent instanceof MApplication
-					|| parent.getWidget() != null;
-
-			if (changedElement.isToBeRendered() && okToRender) {
-				Activator.trace(Policy.DEBUG_RENDERER, "visible -> true", null); //$NON-NLS-1$
-
-				// Note that the 'createGui' protocol calls 'childAdded'
-				Object w = createGui(changedElement);
-				if (w instanceof Control && !(w instanceof Shell)) {
-					fixZOrder(changedElement);
-				}
-			} else {
-				Activator
-						.trace(Policy.DEBUG_RENDERER, "visible -> false", null); //$NON-NLS-1$
-
-				// Ensure that the element about to be removed is not the
-				// selected element
-				if (parent.getSelectedElement() == changedElement)
-					parent.setSelectedElement(null);
-
-				if (okToRender) {
-					// Un-maximize the element before tearing it down
-					if (changedElement.getTags().contains(MAXIMIZED))
-						changedElement.getTags().remove(MAXIMIZED);
-
-					// Note that the 'removeGui' protocol calls 'childRemoved'
-					removeGui(changedElement);
-				}
-			}
-
+		// Handle Detached Windows
+		if (parent == null) {
+			parent = (MElementContainer<?>) ((EObject) changedElement).eContainer();
 		}
-	};
 
-	private EventHandler visibilityHandler = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			MUIElement changedElement = (MUIElement) event
-					.getProperty(UIEvents.EventTags.ELEMENT);
-			MUIElement parent = changedElement.getParent();
-			if (parent == null) {
-				parent = (MUIElement) ((EObject) changedElement).eContainer();
-				if (parent == null) {
-					return;
-				}
+		// menus are not handled here... ??
+		if (parent instanceof MMenu) {
+			return;
+		}
+
+		// If the parent isn't visible we don't care (The application is
+		// never rendered)
+		boolean okToRender = parent instanceof MApplication || parent.getWidget() != null;
+
+		if (changedElement.isToBeRendered() && okToRender) {
+			Activator.trace(Policy.DEBUG_RENDERER, "visible -> true", null); //$NON-NLS-1$
+
+			// Note that the 'createGui' protocol calls 'childAdded'
+			Object w = createGui(changedElement);
+			if (w instanceof Control && !(w instanceof Shell)) {
+				fixZOrder(changedElement);
 			}
+		} else {
+			Activator.trace(Policy.DEBUG_RENDERER, "visible -> false", null); //$NON-NLS-1$
 
-			AbstractPartRenderer renderer = (AbstractPartRenderer) parent
-					.getRenderer();
-			if (renderer == null || parent instanceof MToolBar)
-				return;
+			// Ensure that the element about to be removed is not the
+			// selected element
+			if (parent.getSelectedElement() == changedElement)
+				parent.setSelectedElement(null);
 
-			// Re-parent the control based on the visible state
-			if (changedElement.isVisible()) {
-				if (changedElement.isToBeRendered()) {
-					if (changedElement.getWidget() instanceof Control) {
-						// Ensure that the control is under its 'real' parent if
-						// it's visible
-						Composite realComp = (Composite) renderer
-								.getUIContainer(changedElement);
-						Control ctrl = (Control) changedElement.getWidget();
-// RAP: re-parenting not supported
-//						ctrl.setParent(realComp);
-						ctrl.setVisible(true);
-						fixZOrder(changedElement);
-					}
-
-					if (parent instanceof MElementContainer<?>) {
-						renderer.childRendered(
-								(MElementContainer<MUIElement>) parent,
-								changedElement);
-					}
+			if (okToRender) {
+				// Un-maximize the element before tearing it down
+				if (changedElement.getTags().contains(MAXIMIZED)) {
+					changedElement.getTags().remove(MAXIMIZED);
 				}
-			} else {
-				// Put the control under the 'limbo' shell
+
+				// Note that the 'removeGui' protocol calls 'childRemoved'
+				removeGui(changedElement);
+			}
+		}
+	}
+
+	@Inject
+	@Optional
+	private void subscribeVisibilityHandler(@EventTopic(UIEvents.UIElement.TOPIC_VISIBLE) Event event) {
+
+		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		MUIElement parent = changedElement.getParent();
+		if (parent == null) {
+			parent = (MUIElement) ((EObject) changedElement).eContainer();
+			if (parent == null) {
+				return;
+			}
+		}
+
+		AbstractPartRenderer renderer = (AbstractPartRenderer) parent.getRenderer();
+		if (renderer == null || parent instanceof MToolBar) {
+			return;
+		}
+
+		// Re-parent the control based on the visible state
+		if (changedElement.isVisible()) {
+			if (changedElement.isToBeRendered()) {
 				if (changedElement.getWidget() instanceof Control) {
+					// Ensure that the control is under its 'real' parent if
+					// it's visible
+					Composite realComp = (Composite) renderer.getUIContainer(changedElement);
 					Control ctrl = (Control) changedElement.getWidget();
-
-					if (!(ctrl instanceof Shell)) {
-						ctrl.getShell().layout(new Control[] { ctrl },
-								SWT.DEFER);
-					}
-
-// RAP: re-parenting not supported
-//					ctrl.setParent(getLimboShell());
-					ctrl.setVisible(false);
+					ctrl.setParent(realComp);
+					fixZOrder(changedElement);
 				}
 
 				if (parent instanceof MElementContainer<?>) {
-					renderer.hideChild((MElementContainer<MUIElement>) parent,
-							changedElement);
+					@SuppressWarnings("unchecked")
+					MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) parent;
+					renderer.childRendered(container, changedElement);
+				}
+			}
+		} else {
+			// Put the control under the 'limbo' shell
+			if (changedElement.getWidget() instanceof Control) {
+				Control ctrl = (Control) changedElement.getWidget();
+
+				if (!(ctrl instanceof Shell)) {
+					ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
+				}
+
+				ctrl.setParent(getLimboShell());
+			}
+
+			if (parent instanceof MElementContainer<?>) {
+				@SuppressWarnings("unchecked")
+				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) parent;
+				renderer.hideChild(container, changedElement);
+			}
+		}
+	}
+
+	@Inject
+	@Optional
+	private void subscribeTrimHandler(@EventTopic(UIEvents.TrimmedWindow.TOPIC_TRIMBARS) Event event) {
+
+		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
+		if (!(changedObj instanceof MTrimmedWindow)) {
+			return;
+		}
+
+		MTrimmedWindow window = (MTrimmedWindow) changedObj;
+		if (window.getWidget() == null) {
+			return;
+		}
+
+		if (UIEvents.isADD(event)) {
+			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
+				MUIElement added = (MUIElement) o;
+				if (added.isToBeRendered()) {
+					createGui(added, window.getWidget(), window.getContext());
+				}
+			}
+		} else if (UIEvents.isREMOVE(event)) {
+			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
+				MUIElement removed = (MUIElement) o;
+				if (removed.getRenderer() != null) {
+					removeGui(removed);
 				}
 			}
 		}
-	};
+	}
 
-	private EventHandler trimHandler = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-			if (!(changedObj instanceof MTrimmedWindow))
-				return;
+	@Inject
+	@Optional
+	private void subscribeChildrenHandler(@EventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
 
-			MTrimmedWindow window = (MTrimmedWindow) changedObj;
-			if (window.getWidget() == null)
-				return;
-
-			if (UIEvents.isADD(event)) {
-				for (Object o : UIEvents.asIterable(event,
-						UIEvents.EventTags.NEW_VALUE)) {
-					MUIElement added = (MUIElement) o;
-					if (added.isToBeRendered())
-						createGui(added, window.getWidget(),
-								window.getContext());
-				}
-			} else if (UIEvents.isREMOVE(event)) {
-				for (Object o : UIEvents.asIterable(event,
-						UIEvents.EventTags.NEW_VALUE)) {
-					MUIElement removed = (MUIElement) o;
-					if (removed.getRenderer() != null)
-						removeGui(removed);
-				}
-			}
+		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
+		if (!(changedObj instanceof MElementContainer<?>)) {
+			return;
 		}
-	};
 
-	private EventHandler childrenHandler = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
+		@SuppressWarnings("unchecked")
+		MElementContainer<MUIElement> changedElement = (MElementContainer<MUIElement>) changedObj;
+		boolean isApplication = changedObj instanceof MApplication;
 
-			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-			if (!(changedObj instanceof MElementContainer<?>))
-				return;
+		boolean menuChild = changedObj instanceof MMenu;
+		// If the parent isn't in the UI then who cares?
+		AbstractPartRenderer renderer = getRendererFor(changedElement);
+		if ((!isApplication && renderer == null) || menuChild) {
+			return;
+		}
 
-			MElementContainer<MUIElement> changedElement = (MElementContainer<MUIElement>) changedObj;
-			boolean isApplication = changedObj instanceof MApplication;
+		if (UIEvents.isADD(event)) {
+			Activator.trace(Policy.DEBUG_RENDERER, "Child Added", null); //$NON-NLS-1$
+			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
+				MUIElement added = (MUIElement) o;
 
-			boolean menuChild = changedObj instanceof MMenu;
-			// If the parent isn't in the UI then who cares?
-			AbstractPartRenderer renderer = getRendererFor(changedElement);
-			if ((!isApplication && renderer == null) || menuChild)
-				return;
-
-			if (UIEvents.isADD(event)) {
-				Activator.trace(Policy.DEBUG_RENDERER, "Child Added", null); //$NON-NLS-1$
-				for (Object o : UIEvents.asIterable(event,
-						UIEvents.EventTags.NEW_VALUE)) {
-					MUIElement added = (MUIElement) o;
-
-					// OK, we have a new -visible- part we either have to create
-					// it or host it under the correct parent. Note that we
-					// explicitly do *not* render non-selected elements in
-					// stacks (to support lazy loading).
-					boolean isStack = changedObj instanceof MGenericStack<?>;
-					boolean hasWidget = added.getWidget() != null;
-					boolean isSelected = added == changedElement
-							.getSelectedElement();
-					boolean renderIt = !isStack || hasWidget || isSelected;
-					if (renderIt) {
-						// NOTE: createGui will call 'childAdded' if successful
-						Object w = createGui(added);
-						if (w instanceof Control && !(w instanceof Shell)) {
-							final Control ctrl = (Control) w;
-							fixZOrder(added);
-							if (!ctrl.isDisposed()) {
-								ctrl.getShell().layout(new Control[] { ctrl },
-										SWT.DEFER);
-							}
+				// OK, we have a new -visible- part we either have to create
+				// it or host it under the correct parent. Note that we
+				// explicitly do *not* render non-selected elements in
+				// stacks (to support lazy loading).
+				boolean isStack = changedObj instanceof MGenericStack<?>;
+				boolean hasWidget = added.getWidget() != null;
+				boolean isSelected = added == changedElement.getSelectedElement();
+				boolean renderIt = !isStack || hasWidget || isSelected;
+				if (renderIt) {
+					// NOTE: createGui will call 'childAdded' if successful
+					Object w = createGui(added);
+					if (w instanceof Control && !(w instanceof Shell)) {
+						final Control ctrl = (Control) w;
+						fixZOrder(added);
+						if (!ctrl.isDisposed()) {
+							ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
 						}
-					} else {
-						if (renderer != null && added.isToBeRendered())
-							renderer.childRendered(changedElement, added);
 					}
-
-					// If the element being added is a placeholder, check to see
-					// if
-					// it's 'globally visible' and, if so, remove all other
-					// 'local' placeholders referencing the same element.
-					int newLocation = modelService.getElementLocation(added);
-					if (newLocation == EModelService.IN_SHARED_AREA
-							|| newLocation == EModelService.OUTSIDE_PERSPECTIVE) {
-						MWindow topWin = modelService
-								.getTopLevelWindowFor(added);
-						modelService.hideLocalPlaceholders(topWin, null);
+				} else {
+					if (renderer != null && added.isToBeRendered()) {
+						renderer.childRendered(changedElement, added);
 					}
 				}
-			} else if (UIEvents.isREMOVE(event)) {
-				Activator.trace(Policy.DEBUG_RENDERER, "Child Removed", null); //$NON-NLS-1$
-				for (Object o : UIEvents.asIterable(event,
-						UIEvents.EventTags.OLD_VALUE)) {
-					MUIElement removed = (MUIElement) o;
-					// Removing invisible elements is a NO-OP as far as the
-					// renderer is concerned
-					if (!removed.isToBeRendered())
-						continue;
 
-					if (removed.getWidget() instanceof Control) {
-						Control ctrl = (Control) removed.getWidget();
-						ctrl.setLayoutData(null);
-						ctrl.getParent().layout(new Control[] { ctrl },
-								SWT.CHANGED | SWT.DEFER);
-					}
+				// If the element being added is a placeholder, check to see
+				// if
+				// it's 'globally visible' and, if so, remove all other
+				// 'local' placeholders referencing the same element.
+				int newLocation = modelService.getElementLocation(added);
+				if (newLocation == EModelService.IN_SHARED_AREA || newLocation == EModelService.OUTSIDE_PERSPECTIVE) {
+					MWindow topWin = modelService.getTopLevelWindowFor(added);
+					modelService.hideLocalPlaceholders(topWin, null);
+				}
+			}
+		} else if (UIEvents.isREMOVE(event)) {
+			Activator.trace(Policy.DEBUG_RENDERER, "Child Removed", null); //$NON-NLS-1$
+			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {
+				MUIElement removed = (MUIElement) o;
+				// Removing invisible elements is a NO-OP as far as the
+				// renderer is concerned
+				if (!removed.isToBeRendered()) {
+					continue;
+				}
 
-					// Ensure that the element about to be removed is not the
-					// selected element
-					if (changedElement.getSelectedElement() == removed)
-						changedElement.setSelectedElement(null);
+				if (removed.getWidget() instanceof Control) {
+					Control ctrl = (Control) removed.getWidget();
+					ctrl.setLayoutData(null);
+					ctrl.getParent().layout(new Control[] { ctrl }, SWT.CHANGED | SWT.DEFER);
+				}
 
-					if (renderer != null)
-						renderer.hideChild(changedElement, removed);
+				// Ensure that the element about to be removed is not the
+				// selected element
+				if (changedElement.getSelectedElement() == removed) {
+					changedElement.setSelectedElement(null);
+				}
+
+				if (renderer != null) {
+					renderer.hideChild(changedElement, removed);
 				}
 			}
 		}
-	};
+	}
 
-	private EventHandler windowsHandler = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			childrenHandler.handleEvent(event);
-		}
-	};
+	@Inject
+	@Optional
+	private void subscribeWindowsHandler(@EventTopic(UIEvents.Window.TOPIC_WINDOWS) Event event) {
+
+		subscribeChildrenHandler(event);
+	}
+
+	@Inject
+	@Optional
+	private void subscribePerspectiveWindowsHandler(@EventTopic(UIEvents.Perspective.TOPIC_WINDOWS) Event event) {
+		subscribeChildrenHandler(event);
+	}
+
 	// FIXME RAP unsupported
+	// @Inject
+	// @Optional
+	// private void
+	// subscribeCssThemeChanged(@EventTopic(IThemeEngine.Events.THEME_CHANGED)
+	// Event event) {
+	// cssThemeChangedHandler.handleEvent(event);
+	// }
+
 	// private StylingPreferencesHandler cssThemeChangedHandler;
 
 	private IEclipseContext appContext;
@@ -368,22 +371,26 @@ public class PartRenderingEngine implements IPresentationEngine {
 	protected void fixZOrder(MUIElement element) {
 		MElementContainer<MUIElement> parent = element.getParent();
 		if (parent == null) {
-			Object container = ((EObject) element).eContainer();
-			if (container instanceof MElementContainer<?>) {
-				parent = (MElementContainer<MUIElement>) container;
+			Object econtainer = ((EObject) element).eContainer();
+			if (econtainer instanceof MElementContainer<?>) {
+				@SuppressWarnings("unchecked")
+				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) econtainer;
+				parent = container;
 			}
 		}
-		if (parent == null || !(element.getWidget() instanceof Control))
+		if (parent == null || !(element.getWidget() instanceof Control)) {
 			return;
+		}
 
 		Control elementCtrl = (Control) element.getWidget();
 		Control prevCtrl = null;
 		for (MUIElement kid : parent.getChildren()) {
 			if (kid == element) {
-				if (prevCtrl != null)
+				if (prevCtrl != null) {
 					elementCtrl.moveBelow(prevCtrl);
-				else
+				} else {
 					elementCtrl.moveAbove(null);
+				}
 				break;
 			} else if (kid.getWidget() instanceof Control && kid.isVisible()) {
 				prevCtrl = (Control) kid.getWidget();
@@ -409,7 +416,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	/**
 	 * Initialize a part renderer from the extension point.
-	 * 
+	 *
 	 * @param context
 	 *            the context for the part factories
 	 */
@@ -452,38 +459,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 		curFactory = factory;
 		context.set(IRendererFactory.class, curFactory);
 
-		// Hook up the widget life-cycle subscriber
-		if (eventBroker != null) {
-			eventBroker.subscribe(UIEvents.UIElement.TOPIC_TOBERENDERED,
-					toBeRenderedHandler);
-			eventBroker.subscribe(UIEvents.UIElement.TOPIC_VISIBLE,
-					visibilityHandler);
-			eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN,
-					childrenHandler);
-			eventBroker
-					.subscribe(UIEvents.Window.TOPIC_WINDOWS, windowsHandler);
-			eventBroker.subscribe(UIEvents.Perspective.TOPIC_WINDOWS,
-					windowsHandler);
-			eventBroker.subscribe(UIEvents.TrimmedWindow.TOPIC_TRIMBARS,
-					trimHandler);
-			// FIXME RAP unsupported
-			// cssThemeChangedHandler = new StylingPreferencesHandler(
-			// context.get(Display.class));
-			// eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED,
-			// cssThemeChangedHandler);
-		}
-	}
-
-	@PreDestroy
-	void contextDisposed() {
-		if (eventBroker == null)
-			return;
-		eventBroker.unsubscribe(toBeRenderedHandler);
-		eventBroker.unsubscribe(visibilityHandler);
-		eventBroker.unsubscribe(childrenHandler);
-		eventBroker.unsubscribe(trimHandler);
-		// FIXME RAP unsupported
-		// eventBroker.unsubscribe(cssThemeChangedHandler);
+		// cssThemeChangedHandler = new
+		// StylingPreferencesHandler(context.get(Display.class));
 	}
 
 	private static void populateModelInterfaces(MContext contextModel,
@@ -754,7 +731,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.e4.ui.workbench.IPresentationEngine#focusGui(org.eclipse.
 	 * e4.ui.model.application.ui.MUIElement)
