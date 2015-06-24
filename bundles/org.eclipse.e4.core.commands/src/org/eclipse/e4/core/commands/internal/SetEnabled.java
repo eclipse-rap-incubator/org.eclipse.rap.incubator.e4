@@ -20,10 +20,11 @@ import java.lang.annotation.Target;
 /**
  * Use this annotation to tag a method to call the handler setEnabled method.
  * <p>
- * This annotation must not be applied to more than one method per class. If several class methods
- * are tagged with this annotation, only one of them will be called.
+ * This annotation must not be applied to more than one method per class. If
+ * several class methods are tagged with this annotation, only one of them will
+ * be called.
  * </p>
- * 
+ *
  * @since 1.3
  * @noreference
  */
