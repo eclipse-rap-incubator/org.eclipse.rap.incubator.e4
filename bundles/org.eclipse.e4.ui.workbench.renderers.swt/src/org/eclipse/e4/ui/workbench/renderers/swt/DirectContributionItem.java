@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Joseph Carroll <jdsalingerjr@gmail.com> - Bug 385414 Contributing wizards 
+ *     Joseph Carroll <jdsalingerjr@gmail.com> - Bug 385414 Contributing wizards
  *     to toolbar always displays icon and text
+ *     Bruce Skingle <Bruce.Skingle@immutify.com> - Bug 443092
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -65,6 +66,11 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
 public class DirectContributionItem extends ContributionItem {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/** Internal key for transient maps to provide a runnable on widget disposal */
 	public static final String DISPOSABLE = "IDisposable"; //$NON-NLS-1$
 
@@ -72,6 +78,8 @@ public class DirectContributionItem extends ContributionItem {
 	private static final String ICON_URI = "iconURI"; //$NON-NLS-1$
 	private static final String DISABLED_URI = "disabledURI"; //$NON-NLS-1$
 	private static final String DCI_STATIC_CONTEXT = "DCI-staticContext"; //$NON-NLS-1$
+
+	private static final Object missingExecute = new Object();
 
 	private MItem model;
 	private Widget widget;
@@ -88,7 +96,7 @@ public class DirectContributionItem extends ContributionItem {
 	private ISWTResourceUtilities resUtils = null;
 
 	@Inject
-	void setResourceUtils(IResourceUtilities utils) {
+	void setResourceUtils(IResourceUtilities<ImageDescriptor> utils) {
 		resUtils = (ISWTResourceUtilities) utils;
 	}
 
@@ -97,6 +105,11 @@ public class DirectContributionItem extends ContributionItem {
 	private Logger logger;
 
 	private IMenuListener menuListener = new IMenuListener() {
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public void menuAboutToShow(IMenuManager manager) {
 			update(null);
@@ -109,13 +122,6 @@ public class DirectContributionItem extends ContributionItem {
 		updateVisible();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
-	 * .Menu, int)
-	 */
 	@Override
 	public void fill(Menu menu, int index) {
 		if (model == null) {
@@ -150,13 +156,6 @@ public class DirectContributionItem extends ContributionItem {
 		update(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
-	 * .ToolBar, int)
-	 */
 	@Override
 	public void fill(ToolBar parent, int index) {
 		if (model == null) {
@@ -204,21 +203,11 @@ public class DirectContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#update()
-	 */
 	@Override
 	public void update() {
 		update(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#update(java.lang.String)
-	 */
 	@Override
 	public void update(String id) {
 		updateIcons();
@@ -319,6 +308,11 @@ public class DirectContributionItem extends ContributionItem {
 	private Listener getItemListener() {
 		if (menuItemListener == null) {
 			menuItemListener = new Listener() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
@@ -357,11 +351,6 @@ public class DirectContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#dispose()
-	 */
 	@Override
 	public void dispose() {
 		if (widget != null) {
@@ -439,6 +428,11 @@ public class DirectContributionItem extends ContributionItem {
 						.getShell());
 				if (menu != null) {
 					toolItem.addDisposeListener(new DisposeListener() {
+						/**
+						 *
+						 */
+						private static final long serialVersionUID = 1L;
+
 						@Override
 						public void widgetDisposed(DisposeEvent e) {
 							if (menu != null && !menu.isDisposed()) {
@@ -488,8 +482,11 @@ public class DirectContributionItem extends ContributionItem {
 		}
 		MContribution contrib = (MContribution) model;
 		IEclipseContext staticContext = getStaticContext(trigger);
-		ContextInjectionFactory.invoke(contrib.getObject(), Execute.class,
-				getExecutionContext(lclContext), staticContext, null);
+		Object result = ContextInjectionFactory.invoke(contrib.getObject(), Execute.class,
+				getExecutionContext(lclContext), staticContext, missingExecute);
+		if (result == missingExecute && logger != null) {
+			logger.error("Contribution is missing @Execute: " + contrib.getContributionURI()); //$NON-NLS-1$
+		}
 	}
 
 	private boolean canExecuteItem(Event trigger) {
@@ -509,12 +506,15 @@ public class DirectContributionItem extends ContributionItem {
 	 * Return the execution context for the @CanExecute and @Execute methods.
 	 * This should be the same as the execution context used by the
 	 * EHandlerService.
-	 * 
+	 *
 	 * @param context
 	 *            the context for this item
 	 * @return the execution context
 	 */
 	private IEclipseContext getExecutionContext(IEclipseContext context) {
+		if (context == null)
+			return null;
+
 		return context.getActiveLeaf();
 	}
 
@@ -545,7 +545,7 @@ public class DirectContributionItem extends ContributionItem {
 
 	/**
 	 * Return a parent context for this part.
-	 * 
+	 *
 	 * @param element
 	 *            the part to start searching from
 	 * @return the parent's closest context, or global context if none in the
@@ -557,7 +557,7 @@ public class DirectContributionItem extends ContributionItem {
 
 	/**
 	 * Return a context for this part.
-	 * 
+	 *
 	 * @param part
 	 *            the part to start searching from
 	 * @return the closest context, or global context if none in the hierarchy

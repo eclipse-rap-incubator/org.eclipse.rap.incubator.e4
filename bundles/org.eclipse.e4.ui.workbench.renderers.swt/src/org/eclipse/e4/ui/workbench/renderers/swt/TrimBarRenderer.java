@@ -14,11 +14,10 @@
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import org.eclipse.e4.core.commands.ExpressionContext;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
@@ -73,26 +72,12 @@ public class TrimBarRenderer extends SWTPartRenderer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#init(org.eclipse
-	 * .e4.core.contexts.IEclipseContext)
-	 */
 	@Override
 	public void init(IEclipseContext context) {
 		super.init(context);
 		application = context.get(MApplication.class);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.PartFactory#createWidget(org.eclipse
-	 * .e4.ui.model.application.MPart)
-	 */
 	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MTrimBar) || !(parent instanceof Composite))
@@ -122,6 +107,11 @@ public class TrimBarRenderer extends SWTPartRenderer {
 				return null;
 			}
 			trimComposite.addDisposeListener(new DisposeListener() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(trimModel);
@@ -143,13 +133,6 @@ public class TrimBarRenderer extends SWTPartRenderer {
 		layoutTrim((MTrimBar) downCast);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartFactory#processContents
-	 * (org.eclipse.e4.ui.model.application.MPart)
-	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> me) {
 		if (!(((MUIElement) me) instanceof MTrimBar))

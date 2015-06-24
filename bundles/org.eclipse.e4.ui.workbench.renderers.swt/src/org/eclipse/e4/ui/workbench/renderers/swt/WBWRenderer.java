@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728
- *     Simon Scholz <scholzsimon@arcor.de - Bug 429729
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 441150, 444410
+ *     Simon Scholz <Lars.Vogel@vogella.com> - Bug 429729
+ *     Mike Leneweit <mike-le@web.de> - Bug 444410
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -18,11 +19,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.SWTRenderersMessages;
@@ -73,10 +74,10 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
 
 /**
- * Render a Window or Workbench Window.
+ * Default SWT renderer responsible for an instance of MWindow. See
+ * {@link WorkbenchRendererFactory}
  */
 public class WBWRenderer extends SWTPartRenderer {
 
@@ -88,13 +89,12 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		@Override
 		public void run() {
-			clearSizeUpdate();
+			boundsJob = null;
 			while (!windowsToUpdate.isEmpty()) {
 				MWindow window = windowsToUpdate.remove(0);
 				Shell shell = (Shell) window.getWidget();
 				if (shell == null || shell.isDisposed())
 					continue;
-
 				shell.setBounds(window.getX(), window.getY(),
 						window.getWidth(), window.getHeight());
 			}
@@ -103,46 +103,158 @@ public class WBWRenderer extends SWTPartRenderer {
 
 	WindowSizeUpdateJob boundsJob;
 
-	void clearSizeUpdate() {
-		boundsJob = null;
-	}
-
 	boolean ignoreSizeChanges = false;
 
 	@Inject
 	Logger logger;
 
 	@Inject
-	private IEventBroker eventBroker;
+	private IEclipseContext context;
 
 	@Inject
 	private IPresentationEngine engine;
 
-	private EventHandler topWindowHandler;
-	private EventHandler shellUpdater;
-	private EventHandler visibilityHandler;
-	private EventHandler sizeHandler;
-	//FIXME RAP not supported
-//	private ThemeDefinitionChangedHandler themeDefinitionChanged;
+	// private ThemeDefinitionChangedHandler themeDefinitionChanged;
 
 	@Inject
 	private EModelService modelService;
 
-	public WBWRenderer() {
-		super();
+	@Inject
+	private Display display;
+
+	@Inject
+	@Optional
+	private void subscribeTopicSelectedElementChanged(
+			@UIEventTopic(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT) Event event) {
+		// Ensure that this event is for a MApplication
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MApplication))
+			return;
+		MWindow win = (MWindow) event.getProperty(UIEvents.EventTags.NEW_VALUE);
+		if ((win == null) || !win.getTags().contains("topLevel")) //$NON-NLS-1$
+			return;
+		win.setToBeRendered(true);
+		if (!(win.getRenderer() == WBWRenderer.this))
+			return;
+		Shell shell = (Shell) win.getWidget();
+		if (shell.getMinimized()) {
+			shell.setMinimized(false);
+		}
+		shell.setActive();
+		shell.moveAbove(null);
+	}
+
+	@Inject
+	@Optional
+	private void subscribeTopicLabelChanged(@UIEventTopic(UIEvents.UILabel.TOPIC_ALL) Event event) {
+		Object objElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MWindow))
+			return;
+
+		// Is this listener interested ?
+		MWindow windowModel = (MWindow) objElement;
+		if (windowModel.getRenderer() != WBWRenderer.this)
+			return;
+
+		// No widget == nothing to update
+		Shell theShell = (Shell) windowModel.getWidget();
+		if (theShell == null)
+			return;
+
+		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
+
+		if (UIEvents.UILabel.LABEL.equals(attName) || UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+			String newTitle = (String) event.getProperty(UIEvents.EventTags.NEW_VALUE);
+			theShell.setText(newTitle);
+		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
+			theShell.setImage(getImage(windowModel));
+		} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
+			String newTTip = (String) event.getProperty(UIEvents.EventTags.NEW_VALUE);
+			theShell.setToolTipText(newTTip);
+		}
+	}
+
+	@Inject
+	@Optional
+	private void subscribeTopicWindowChanged(@UIEventTopic(UIEvents.Window.TOPIC_ALL) Event event) {
+		if (ignoreSizeChanges)
+			return;
+
+		// Ensure that this event is for a MMenuItem
+		Object objElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+		if (!(objElement instanceof MWindow)) {
+			return;
+		}
+
+		// Is this listener interested ?
+		MWindow windowModel = (MWindow) objElement;
+		if (windowModel.getRenderer() != WBWRenderer.this) {
+			return;
+		}
+
+		// No widget == nothing to update
+		Shell theShell = (Shell) windowModel.getWidget();
+		if (theShell == null) {
+			return;
+		}
+
+		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
+
+		if (UIEvents.Window.X.equals(attName) || UIEvents.Window.Y.equals(attName)
+				|| UIEvents.Window.WIDTH.equals(attName) || UIEvents.Window.HEIGHT.equals(attName)) {
+			if (boundsJob == null) {
+				boundsJob = new WindowSizeUpdateJob();
+				boundsJob.windowsToUpdate.add(windowModel);
+				theShell.getDisplay().asyncExec(boundsJob);
+			} else {
+				if (!boundsJob.windowsToUpdate.contains(windowModel))
+					boundsJob.windowsToUpdate.add(windowModel);
+			}
+		}
+	}
+
+	@Inject
+	@Optional
+	private void subscribeTopicVisibleChanged(@UIEventTopic(UIEvents.UIElement.TOPIC_VISIBLE) Event event) {
+		// Ensure that this event is for a MMenuItem
+		Object objElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+		if (!(objElement instanceof MWindow))
+			return;
+
+		// Is this listener interested ?
+		MWindow windowModel = (MWindow) objElement;
+		if (windowModel.getRenderer() != WBWRenderer.this)
+			return;
+
+		// No widget == nothing to update
+		Shell theShell = (Shell) windowModel.getWidget();
+		if (theShell == null)
+			return;
+
+		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
+
+		if (UIEvents.UIElement.VISIBLE.equals(attName)) {
+			boolean isVisible = (Boolean) event.getProperty(UIEvents.EventTags.NEW_VALUE);
+			theShell.setVisible(isVisible);
+		}
+	}
+
+	@Inject
+	@Optional
+	private void subscribeThemeDefinitionChanged(
+			@UIEventTopic(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED) Event event) {
+		// themeDefinitionChanged.handleEvent(event);
 	}
 
 	/**
 	 * Closes the provided detached window.
-	 * 
+	 *
 	 * @param window
 	 *            the detached window to close
 	 * @return <code>true</code> if the window should be closed,
 	 *         <code>false</code> otherwise
 	 */
 	private boolean closeDetachedWindow(MWindow window) {
-		EPartService partService = (EPartService) window.getContext().get(
-				EPartService.class.getName());
+		EPartService partService = window.getContext().get(EPartService.class);
 		List<MPart> parts = modelService.findElements(window, null,
 				MPart.class, null);
 		// this saves one part at a time, not ideal but better than not saving
@@ -162,169 +274,8 @@ public class WBWRenderer extends SWTPartRenderer {
 	}
 
 	@PostConstruct
-	public void init() {
-
-		topWindowHandler = new EventHandler() {
-
-			@Override
-			public void handleEvent(Event event) {
-				// Ensure that this event is for a MApplication
-				if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MApplication))
-					return;
-				MWindow win = (MWindow) event
-						.getProperty(UIEvents.EventTags.NEW_VALUE);
-				if ((win == null) || !win.getTags().contains("topLevel")) //$NON-NLS-1$
-					return;
-				win.setToBeRendered(true);
-				if (!(win.getRenderer() == WBWRenderer.this))
-					return;
-				Shell shell = (Shell) win.getWidget();
-				if (shell.getMinimized()) {
-					shell.setMinimized(false);
-				}
-				shell.setActive();
-				shell.moveAbove(null);
-
-			}
-		};
-
-		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT,
-				topWindowHandler);
-
-		shellUpdater = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				// Ensure that this event is for a MMenuItem
-				Object objElement = event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-				if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MWindow))
-					return;
-
-				// Is this listener interested ?
-				MWindow windowModel = (MWindow) objElement;
-				if (windowModel.getRenderer() != WBWRenderer.this)
-					return;
-
-				// No widget == nothing to update
-				Shell theShell = (Shell) windowModel.getWidget();
-				if (theShell == null)
-					return;
-
-				String attName = (String) event
-						.getProperty(UIEvents.EventTags.ATTNAME);
-
-				if (UIEvents.UILabel.LABEL.equals(attName)
-						|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
-					String newTitle = (String) event
-							.getProperty(UIEvents.EventTags.NEW_VALUE);
-					theShell.setText(newTitle);
-				} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
-					theShell.setImage(getImage(windowModel));
-				} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
-						|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
-					String newTTip = (String) event
-							.getProperty(UIEvents.EventTags.NEW_VALUE);
-					theShell.setToolTipText(newTTip);
-				}
-			}
-		};
-
-		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, shellUpdater);
-
-		visibilityHandler = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				// Ensure that this event is for a MMenuItem
-				Object objElement = event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-				if (!(objElement instanceof MWindow))
-					return;
-
-				// Is this listener interested ?
-				MWindow windowModel = (MWindow) objElement;
-				if (windowModel.getRenderer() != WBWRenderer.this)
-					return;
-
-				// No widget == nothing to update
-				Shell theShell = (Shell) windowModel.getWidget();
-				if (theShell == null)
-					return;
-
-				String attName = (String) event
-						.getProperty(UIEvents.EventTags.ATTNAME);
-
-				if (UIEvents.UIElement.VISIBLE.equals(attName)) {
-					boolean isVisible = (Boolean) event
-							.getProperty(UIEvents.EventTags.NEW_VALUE);
-					theShell.setVisible(isVisible);
-				}
-			}
-		};
-
-		eventBroker.subscribe(UIEvents.UIElement.TOPIC_VISIBLE,
-				visibilityHandler);
-
-		sizeHandler = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				if (ignoreSizeChanges)
-					return;
-
-				// Ensure that this event is for a MMenuItem
-				Object objElement = event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-				if (!(objElement instanceof MWindow)) {
-					return;
-				}
-
-				// Is this listener interested ?
-				MWindow windowModel = (MWindow) objElement;
-				if (windowModel.getRenderer() != WBWRenderer.this) {
-					return;
-				}
-
-				// No widget == nothing to update
-				Shell theShell = (Shell) windowModel.getWidget();
-				if (theShell == null) {
-					return;
-				}
-
-				String attName = (String) event
-						.getProperty(UIEvents.EventTags.ATTNAME);
-
-				if (UIEvents.Window.X.equals(attName)
-						|| UIEvents.Window.Y.equals(attName)
-						|| UIEvents.Window.WIDTH.equals(attName)
-						|| UIEvents.Window.HEIGHT.equals(attName)) {
-					if (boundsJob == null) {
-						boundsJob = new WindowSizeUpdateJob();
-						boundsJob.windowsToUpdate.add(windowModel);
-						theShell.getDisplay().asyncExec(boundsJob);
-					} else {
-						if (!boundsJob.windowsToUpdate.contains(windowModel))
-							boundsJob.windowsToUpdate.add(windowModel);
-					}
-				}
-			}
-		};
-
-		eventBroker.subscribe(UIEvents.Window.TOPIC_ALL, sizeHandler);
-//FIXME RAP unsupported
-//		themeDefinitionChanged = new ThemeDefinitionChangedHandler();
-//		eventBroker.subscribe(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
-//				themeDefinitionChanged);
-	}
-
-	@PreDestroy
-	public void contextDisposed() {
-		eventBroker.unsubscribe(topWindowHandler);
-		eventBroker.unsubscribe(shellUpdater);
-		eventBroker.unsubscribe(visibilityHandler);
-		eventBroker.unsubscribe(sizeHandler);
-//FIXME RAP unsupported
-//		eventBroker.unsubscribe(themeDefinitionChanged);
-//
-//		themeDefinitionChanged.dispose();
+	protected void init() {
+		// themeDefinitionChanged = new ThemeDefinitionChangedHandler();
 	}
 
 	@Override
@@ -337,12 +288,13 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		MWindow wbwModel = (MWindow) element;
 
-//FIXME RAP unsuppported
-//		MApplication appModel = wbwModel.getContext().get(MApplication.class);
-//		Boolean rtlMode = (Boolean) appModel.getTransientData().get(
-//				E4Workbench.RTL_MODE);
-//		int rtlStyle = (rtlMode != null && rtlMode.booleanValue()) ? SWT.RIGHT_TO_LEFT
-//				: 0;
+		// MApplication appModel =
+		// wbwModel.getContext().get(MApplication.class);
+		// Boolean rtlMode = (Boolean)
+		// appModel.getTransientData().get(E4Workbench.RTL_MODE);
+		// FIXME RAP
+		// int rtlStyle = (rtlMode != null && rtlMode.booleanValue()) ?
+		// SWT.RIGHT_TO_LEFT : 0;
 		int rtlStyle = 0;
 
 		Shell parentShell = parent == null ? null : ((Control) parent)
@@ -354,15 +306,23 @@ public class WBWRenderer extends SWTPartRenderer {
 		if (parentShell == null) {
 			int style = styleOverride == -1 ? SWT.SHELL_TRIM | rtlStyle
 					: styleOverride;
-			wbwShell = new Shell(Display.getCurrent(), style);
+			wbwShell = new Shell(display, style);
 			wbwModel.getTags().add("topLevel"); //$NON-NLS-1$
 		} else {
 			int style = SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.CLOSE | rtlStyle;
 			style = styleOverride == -1 ? style : styleOverride;
-			wbwShell = new Shell(parentShell, style);
+			if (wbwModel.getTags().contains(IPresentationEngine.WINDOW_TOP_LEVEL))
+				wbwShell = new Shell(display, style);
+			else
+				wbwShell = new Shell(parentShell, style);
 
 			// Prevent ESC from closing the DW
 			wbwShell.addTraverseListener(new TraverseListener() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				@Override
 				public void keyTraversed(TraverseEvent e) {
 					if (e.detail == SWT.TRAVERSE_ESCAPE) {
@@ -419,10 +379,15 @@ public class WBWRenderer extends SWTPartRenderer {
 		bindWidget(element, newWidget);
 
 		// Add the shell into the WBW's context
-		localContext.set(Shell.class.getName(), wbwShell);
+		localContext.set(Shell.class, wbwShell);
 		localContext.set(E4Workbench.LOCAL_ACTIVE_SHELL, wbwShell);
 		setCloseHandler(wbwModel);
-		localContext.set(IShellProvider.class.getName(), new IShellProvider() {
+		localContext.set(IShellProvider.class, new IShellProvider() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Shell getShell() {
 				return wbwShell;
@@ -481,7 +446,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		IEclipseContext context = window.getContext();
 		// no direct model parent, must be a detached window
 		if (window.getParent() == null) {
-			context.set(IWindowCloseHandler.class.getName(),
+			context.set(IWindowCloseHandler.class,
 					new IWindowCloseHandler() {
 						@Override
 						public boolean close(MWindow window) {
@@ -489,13 +454,11 @@ public class WBWRenderer extends SWTPartRenderer {
 						}
 					});
 		} else {
-			context.set(IWindowCloseHandler.class.getName(),
+			context.set(IWindowCloseHandler.class,
 					new IWindowCloseHandler() {
 						@Override
 						public boolean close(MWindow window) {
-							EPartService partService = (EPartService) window
-									.getContext().get(
-											EPartService.class.getName());
+					EPartService partService = window.getContext().get(EPartService.class);
 							return partService.saveAll(true);
 						}
 					});
@@ -512,6 +475,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			final Shell shell = (Shell) widget;
 			final MWindow w = (MWindow) me;
 			shell.addControlListener(new ControlListener() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				@Override
 				public void controlResized(ControlEvent e) {
 					// Don't store the maximized size in the model
@@ -544,14 +512,17 @@ public class WBWRenderer extends SWTPartRenderer {
 			});
 
 			shell.addShellListener(new ShellAdapter() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				@Override
 				public void shellClosed(ShellEvent e) {
 					// override the shell close event
 					e.doit = false;
 					MWindow window = (MWindow) e.widget.getData(OWNING_ME);
-					IWindowCloseHandler closeHandler = (IWindowCloseHandler) window
-							.getContext().get(
-									IWindowCloseHandler.class.getName());
+					IWindowCloseHandler closeHandler = window.getContext().get(IWindowCloseHandler.class);
 					// if there's no handler or the handler permits the close
 					// request, clean-up as necessary
 					if (closeHandler == null || closeHandler.close(window)) {
@@ -560,6 +531,11 @@ public class WBWRenderer extends SWTPartRenderer {
 				}
 			});
 			shell.addListener(SWT.Activate, new Listener() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				@Override
 				public void handleEvent(org.eclipse.swt.widgets.Event event) {
 					MUIElement parentME = w.getParent();
@@ -578,6 +554,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			});
 
 			shell.addListener(SWT.Deactivate, new Listener() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				@Override
 				public void handleEvent(org.eclipse.swt.widgets.Event event) {
 					updateNonFocusState(SWT.Deactivate, w);
@@ -644,10 +625,6 @@ public class WBWRenderer extends SWTPartRenderer {
 	/*
 	 * Processing the contents of a Workbench window has to take into account
 	 * that there may be trim elements contained in its child list. Since the
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartFactory#processContents
-	 * (org.eclipse.e4.ui.model.application.MPart)
 	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> me) {
@@ -657,8 +634,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		super.processContents(me);
 
 		// Populate the main menu
-		IPresentationEngine renderer = (IPresentationEngine) context
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine renderer = context.get(IPresentationEngine.class);
 		if (wbwModel.getMainMenu() != null) {
 			renderer.createGui(wbwModel.getMainMenu(), me.getWidget(), null);
 			Shell shell = (Shell) me.getWidget();
@@ -712,6 +688,11 @@ public class WBWRenderer extends SWTPartRenderer {
 		// Capture the max/min state
 		final MUIElement disposeME = shellME;
 		shell.addDisposeListener(new DisposeListener() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				Shell shell = (Shell) e.widget;
@@ -752,9 +733,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		return dialog.getCheckedElements();
 	}
 
-	@Inject
-	private IEclipseContext context;
-
 	private void applyDialogStyles(Control control) {
 		IStylingEngine engine = (IStylingEngine) context
 				.get(IStylingEngine.SERVICE_NAME);
@@ -769,6 +747,11 @@ public class WBWRenderer extends SWTPartRenderer {
 	}
 
 	class SaveablePartPromptDialog extends Dialog {
+
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
 
 		private Collection<MPart> collection;
 
@@ -787,6 +770,7 @@ public class WBWRenderer extends SWTPartRenderer {
 			newShell.setText(SWTRenderersMessages.choosePartsToSaveTitle);
 		}
 
+
 		@Override
 		protected Control createDialogArea(Composite parent) {
 			parent = (Composite) super.createDialogArea(parent);
@@ -802,6 +786,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			data.widthHint = 300;
 			tableViewer.getControl().setLayoutData(data);
 			tableViewer.setLabelProvider(new LabelProvider() {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
+
 				@Override
 				public String getText(Object element) {
 					return ((MPart) element).getLocalizedLabel();
@@ -836,67 +825,61 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 
 	}
-	
-//FIXME RAP unsupported
-//	@SuppressWarnings("restriction")
-//	protected static class ThemeDefinitionChangedHandler implements
-//			EventHandler {
-//		protected Set<Resource> unusedResources = new HashSet<Resource>();
-//
-//		@Override
-//		public void handleEvent(Event event) {
-//			Object element = event.getProperty(IEventBroker.DATA);
-//
-//			if (!(element instanceof MApplication)) {
-//				return;
-//			}
-//
-//			Set<CSSEngine> engines = new HashSet<CSSEngine>();
-//
-//			// In theory we can have multiple engines since API allows it.
-//			// It doesn't hurt to be prepared for such case
-//			for (MWindow window : ((MApplication) element).getChildren()) {
-//				CSSEngine engine = getEngine(window);
-//				if (engine != null) {
-//					engines.add(engine);
-//				}
-//			}
-//
-//			for (CSSEngine engine : engines) {
-//				for (Object resource : removeResources(engine
-//						.getResourcesRegistry())) {
-//					if (resource instanceof Resource
-//							&& !((Resource) resource).isDisposed()) {
-//						unusedResources.add((Resource) resource);
-//					}
-//				}
-//				engine.reapply();
-//			}
-//		}
-//
-//		protected CSSEngine getEngine(MWindow window) {
-//			return WidgetElement.getEngine((Widget) window.getWidget());
-//		}
-//
-//		protected List<Object> removeResources(IResourcesRegistry registry) {
-//			if (registry instanceof SWTResourcesRegistry) {
-//				return ((SWTResourcesRegistry) registry)
-//						.removeResourcesByKeyTypeAndType(
-//								ResourceByDefinitionKey.class, Font.class,
-//								Color.class);
-//			}
-//			return Collections.emptyList();
-//		}
-//
-//		public void dispose() {
-//			for (Resource resource : unusedResources) {
-//				if (!resource.isDisposed()) {
-//					resource.dispose();
-//				}
-//			}
-//			unusedResources.clear();
-//		}
-//	}
+
+	// protected static class ThemeDefinitionChangedHandler {
+	// protected Set<Resource> unusedResources = new HashSet<Resource>();
+	//
+	// public void handleEvent(Event event) {
+	// Object element = event.getProperty(IEventBroker.DATA);
+	//
+	// if (!(element instanceof MApplication)) {
+	// return;
+	// }
+	//
+	// Set<CSSEngine> engines = new HashSet<CSSEngine>();
+	//
+	// // In theory we can have multiple engines since API allows it.
+	// // It doesn't hurt to be prepared for such case
+	// for (MWindow window : ((MApplication) element).getChildren()) {
+	// CSSEngine engine = getEngine(window);
+	// if (engine != null) {
+	// engines.add(engine);
+	// }
+	// }
+	//
+	// for (CSSEngine engine : engines) {
+	// for (Object resource : removeResources(engine.getResourcesRegistry())) {
+	// if (resource instanceof Resource && !((Resource) resource).isDisposed())
+	// {
+	// unusedResources.add((Resource) resource);
+	// }
+	// }
+	// engine.reapply();
+	// }
+	// }
+	//
+	// protected CSSEngine getEngine(MWindow window) {
+	// return WidgetElement.getEngine((Widget) window.getWidget());
+	// }
+	//
+	// protected List<Object> removeResources(IResourcesRegistry registry) {
+	// if (registry instanceof SWTResourcesRegistry) {
+	// return ((SWTResourcesRegistry)
+	// registry).removeResourcesByKeyTypeAndType(ResourceByDefinitionKey.class,
+	// Font.class, Color.class);
+	// }
+	// return Collections.emptyList();
+	// }
+	//
+	// public void dispose() {
+	// for (Resource resource : unusedResources) {
+	// if (!resource.isDisposed()) {
+	// resource.dispose();
+	// }
+	// }
+	// unusedResources.clear();
+	// }
+	// }
 
 	private void forceLayout(Shell shell) {
 		int i = 0;

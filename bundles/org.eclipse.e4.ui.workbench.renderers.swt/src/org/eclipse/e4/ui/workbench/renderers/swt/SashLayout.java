@@ -28,6 +28,11 @@ import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 
 public class SashLayout extends Layout {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+
 	// The minimum value (as a percentage) that a sash can be dragged to
 	int minSashPercent = 10;
 
@@ -208,6 +213,11 @@ public class SashLayout extends Layout {
 		Sash sash = new Sash(host, horizontal ? SWT.HORIZONTAL : SWT.VERTICAL);
 		sash.setBounds(sashRect.rect);
 		sash.addListener(SWT.Selection, new Listener() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void handleEvent(Event event) {
 				Display display = host.getDisplay();

@@ -29,13 +29,18 @@ import org.eclipse.swt.widgets.Control;
 
 public class ToolControlContribution extends ControlContribution {
 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private MToolControl model;
 
 	@Inject
 	private IContributionFactory contribFactory;
 
 	@Inject
-	EModelService modelService;
+	private EModelService modelService;
 
 	// private IEclipseContext parentContext;
 
@@ -43,13 +48,6 @@ public class ToolControlContribution extends ControlContribution {
 		super(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ControlContribution#createControl(org.eclipse
-	 * .swt.widgets.Composite)
-	 */
 	@Override
 	protected Control createControl(Composite parent) {
 		IEclipseContext localContext = EclipseContextFactory.create();
@@ -66,6 +64,11 @@ public class ToolControlContribution extends ControlContribution {
 					model.getContributionURI(), parentContext, localContext);
 			model.setObject(tcImpl);
 			newComposite.addDisposeListener(new DisposeListener() {
+
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
 
 				@Override
 				public void widgetDisposed(DisposeEvent e) {

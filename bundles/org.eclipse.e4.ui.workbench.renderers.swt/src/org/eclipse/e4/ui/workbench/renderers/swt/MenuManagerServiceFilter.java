@@ -30,6 +30,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Widget;
 
 public class MenuManagerServiceFilter implements Listener {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static final String NUL_MENU_ITEM = "(None Applicable)"; //$NON-NLS-1$
 
 	private static final String TMP_ORIGINAL_CONTEXT = "MenuServiceFilter.original.context"; //$NON-NLS-1$

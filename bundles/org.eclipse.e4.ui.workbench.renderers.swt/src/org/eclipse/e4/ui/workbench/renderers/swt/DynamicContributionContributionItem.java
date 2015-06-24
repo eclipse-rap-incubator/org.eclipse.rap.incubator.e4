@@ -22,9 +22,19 @@ import org.eclipse.jface.action.IMenuManager;
  * of a dynamic menu contribution entry.
  */
 class DynamicContributionContributionItem extends ContributionItem {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private MDynamicMenuContribution model;
 
 	private IMenuListener menuListener = new IMenuListener() {
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public void menuAboutToShow(IMenuManager manager) {
 			manager.markDirty();
@@ -33,7 +43,7 @@ class DynamicContributionContributionItem extends ContributionItem {
 
 	/**
 	 * Create the item and associated model;
-	 * 
+	 *
 	 * @param item
 	 */
 	public DynamicContributionContributionItem(MDynamicMenuContribution item) {
@@ -41,21 +51,11 @@ class DynamicContributionContributionItem extends ContributionItem {
 		model = item;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#isDirty()
-	 */
 	@Override
 	public boolean isDirty() {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#isDynamic()
-	 */
 	@Override
 	public boolean isDynamic() {
 		return true;
@@ -68,13 +68,6 @@ class DynamicContributionContributionItem extends ContributionItem {
 		return model;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ContributionItem#setParent(org.eclipse.jface
-	 * .action.IContributionManager)
-	 */
 	@Override
 	public void setParent(IContributionManager parent) {
 		if (getParent() instanceof IMenuManager) {

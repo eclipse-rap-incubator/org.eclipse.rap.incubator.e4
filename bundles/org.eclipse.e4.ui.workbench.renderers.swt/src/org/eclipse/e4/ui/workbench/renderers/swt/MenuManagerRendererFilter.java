@@ -46,6 +46,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Widget;
 
 public class MenuManagerRendererFilter implements Listener {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private static final String MMRF_STATIC_CONTEXT = "HCI-staticContext"; //$NON-NLS-1$
 
 	public static final String NUL_MENU_ITEM = "(None Applicable)"; //$NON-NLS-1$
