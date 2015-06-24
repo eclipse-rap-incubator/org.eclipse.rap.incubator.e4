@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2012 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.renderers.swt;
 
-import org.eclipse.e4.ui.workbench.swt.internal.copy.StringMatcher;
+import org.eclipse.e4.ui.workbench.swt.internal.copy.SearchPattern;
 import org.eclipse.e4.ui.workbench.swt.internal.copy.WorkbenchSWTMessages;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -57,13 +57,15 @@ public abstract class AbstractTableInformationControl {
 	 */
 	protected class NamePatternFilter extends ViewerFilter {
 
-		/*
-		 * (non-Javadoc) Method declared on ViewerFilter.
+		/**
+		 *
 		 */
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean select(Viewer viewer, Object parentElement,
 				Object element) {
-			StringMatcher matcher = getMatcher();
+			SearchPattern matcher = getMatcher();
 			if (matcher == null || !(viewer instanceof TableViewer)) {
 				return true;
 			}
@@ -80,7 +82,7 @@ public abstract class AbstractTableInformationControl {
 			if (matchName.startsWith("*")) { //$NON-NLS-1$
 				matchName = matchName.substring(1);
 			}
-			return matcher.match(matchName);
+			return matcher.matches(matchName);
 		}
 	}
 
@@ -96,13 +98,13 @@ public abstract class AbstractTableInformationControl {
 	/** The control's table widget */
 	private TableViewer fTableViewer;
 
-	/** The current string matcher */
-	private StringMatcher fStringMatcher;
+	/** The current search pattern */
+	private SearchPattern fSearchPattern;
 
 	/**
 	 * Creates an information control with the given shell as parent. The given
 	 * styles are applied to the shell and the table widget.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent shell
 	 * @param shellStyle
@@ -125,6 +127,11 @@ public abstract class AbstractTableInformationControl {
 
 		final Table table = fTableViewer.getTable();
 		table.addKeyListener(new KeyListener() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void keyPressed(KeyEvent e) {
 				switch (e.keyCode) {
@@ -160,6 +167,11 @@ public abstract class AbstractTableInformationControl {
 		});
 
 		table.addSelectionListener(new SelectionListener() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// do nothing;
@@ -183,56 +195,62 @@ public abstract class AbstractTableInformationControl {
 		 */
 		// final int ignoreEventCount = Util.isGtk() ? 4 : 1;
 		// FIXME RAP does not support mouse move
-		// table.addMouseMoveListener(new MouseMoveListener() {
-		// TableItem fLastItem = null;
-		// int lastY = 0;
-		// int itemHeightdiv4 = table.getItemHeight() / 4;
-		// int tableHeight = table.getBounds().height;
-		// Point tableLoc = table.toDisplay(0, 0);
-		// int divCount = 0;
-		//
-		// @Override
-		// public void mouseMove(MouseEvent e) {
-		// if (divCount == ignoreEventCount) {
-		// divCount = 0;
-		// }
-		// if (table.equals(e.getSource())
-		// & ++divCount == ignoreEventCount) {
-		// Object o = table.getItem(new Point(e.x, e.y));
-		// if (fLastItem == null ^ o == null) {
-		// table.setCursor(o == null ? null : table.getDisplay()
-		// .getSystemCursor(SWT.CURSOR_HAND));
-		// }
-		// if (o instanceof TableItem && lastY != e.y) {
-		// lastY = e.y;
-		// if (!o.equals(fLastItem)) {
-		// fLastItem = (TableItem) o;
-		// table.setSelection(new TableItem[] { fLastItem });
-		// } else if (e.y < itemHeightdiv4) {
-		// // Scroll up
-		// Item item = fTableViewer.scrollUp(e.x + tableLoc.x,
-		// e.y + tableLoc.y);
-		// if (item instanceof TableItem) {
-		// fLastItem = (TableItem) item;
-		// table.setSelection(new TableItem[] { fLastItem });
-		// }
-		// } else if (e.y > tableHeight - itemHeightdiv4) {
-		// // Scroll down
-		// Item item = fTableViewer.scrollDown(e.x
-		// + tableLoc.x, e.y + tableLoc.y);
-		// if (item instanceof TableItem) {
-		// fLastItem = (TableItem) item;
-		// table.setSelection(new TableItem[] { fLastItem });
-		// }
-		// }
-		// } else if (o == null) {
-		// fLastItem = null;
-		// }
-		// }
-		// }
-		// });
+//
+//		table.addMouseMoveListener(new MouseMoveListener() {
+//			/**
+//			 *
+//			 */
+//			private static final long serialVersionUID = 1L;
+//			TableItem fLastItem = null;
+//			int lastY = 0;
+//			int itemHeightdiv4 = table.getItemHeight() / 4;
+//			int tableHeight = table.getBounds().height;
+//			Point tableLoc = table.toDisplay(0, 0);
+//			int divCount = 0;
+//
+//			@Override
+//			public void mouseMove(MouseEvent e) {
+//				if (divCount == ignoreEventCount) {
+//					divCount = 0;
+//				}
+//				if (table.equals(e.getSource()) & ++divCount == ignoreEventCount) {
+//					Object o = table.getItem(new Point(e.x, e.y));
+//					if (fLastItem == null ^ o == null) {
+//						table.setCursor(o == null ? null : table.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+//					}
+//					if (o instanceof TableItem && lastY != e.y) {
+//						lastY = e.y;
+//						if (!o.equals(fLastItem)) {
+//							fLastItem = (TableItem) o;
+//							table.setSelection(new TableItem[] { fLastItem });
+//						} else if (e.y < itemHeightdiv4) {
+//							// Scroll up
+//							Item item = fTableViewer.scrollUp(e.x + tableLoc.x, e.y + tableLoc.y);
+//							if (item instanceof TableItem) {
+//								fLastItem = (TableItem) item;
+//								table.setSelection(new TableItem[] { fLastItem });
+//							}
+//						} else if (e.y > tableHeight - itemHeightdiv4) {
+//							// Scroll down
+//							Item item = fTableViewer.scrollDown(e.x + tableLoc.x, e.y + tableLoc.y);
+//							if (item instanceof TableItem) {
+//								fLastItem = (TableItem) item;
+//								table.setSelection(new TableItem[] { fLastItem });
+//							}
+//						}
+//					} else if (o == null) {
+//						fLastItem = null;
+//					}
+//				}
+//			}
+//		});
 
 		table.addMouseListener(new MouseAdapter() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void mouseUp(MouseEvent e) {
 				if (table.getSelectionCount() < 1) {
@@ -256,6 +274,11 @@ public abstract class AbstractTableInformationControl {
 						MenuItem mItem = new MenuItem(menu, SWT.NONE);
 						mItem.setText(SWTRenderersMessages.menuClose);
 						mItem.addSelectionListener(new SelectionAdapter() {
+							/**
+							 *
+							 */
+							private static final long serialVersionUID = 1L;
+
 							@Override
 							public void widgetSelected(
 									SelectionEvent selectionEvent) {
@@ -268,42 +291,45 @@ public abstract class AbstractTableInformationControl {
 			}
 		});
 		// FIXME RAP does not support the constants below
-		// fShell.addTraverseListener(new TraverseListener() {
-		// @Override
-		// public void keyTraversed(TraverseEvent e) {
-		// switch (e.detail) {
-		// case SWT.TRAVERSE_PAGE_NEXT:
-		// e.detail = SWT.TRAVERSE_NONE;
-		// e.doit = true;
-		// {
-		// int n = table.getItemCount();
-		// if (n == 0)
-		// return;
-		//
-		// int i = table.getSelectionIndex() + 1;
-		// if (i >= n)
-		// i = 0;
-		// table.setSelection(i);
-		// }
-		// break;
-		//
-		// case SWT.TRAVERSE_PAGE_PREVIOUS:
-		// e.detail = SWT.TRAVERSE_NONE;
-		// e.doit = true;
-		// {
-		// int n = table.getItemCount();
-		// if (n == 0)
-		// return;
-		//
-		// int i = table.getSelectionIndex() - 1;
-		// if (i < 0)
-		// i = n - 1;
-		// table.setSelection(i);
-		// }
-		// break;
-		// }
-		// }
-		// });
+//		fShell.addTraverseListener(new TraverseListener() {
+//			/**
+//			 *
+//			 */
+//			private static final long serialVersionUID = 1L;
+//
+//			@Override
+//			public void keyTraversed(TraverseEvent e) {
+//				switch (e.detail) {
+//				case SWT.TRAVERSE_PAGE_NEXT:
+//					e.detail = SWT.TRAVERSE_NONE;
+//					e.doit = true; {
+//					int n = table.getItemCount();
+//					if (n == 0)
+//						return;
+//
+//					int i = table.getSelectionIndex() + 1;
+//					if (i >= n)
+//						i = 0;
+//					table.setSelection(i);
+//				}
+//					break;
+//
+//				case SWT.TRAVERSE_PAGE_PREVIOUS:
+//					e.detail = SWT.TRAVERSE_NONE;
+//					e.doit = true; {
+//					int n = table.getItemCount();
+//					if (n == 0)
+//						return;
+//
+//					int i = table.getSelectionIndex() - 1;
+//					if (i < 0)
+//						i = n - 1;
+//					table.setSelection(i);
+//				}
+//					break;
+//				}
+//			}
+//		});
 
 		setInfoSystemColor();
 		installFilter();
@@ -350,6 +376,11 @@ public abstract class AbstractTableInformationControl {
 		fFilterText.setLayoutData(data);
 
 		fFilterText.addKeyListener(new KeyListener() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void keyPressed(KeyEvent e) {
 				switch (e.keyCode) {
@@ -396,13 +427,14 @@ public abstract class AbstractTableInformationControl {
 		fFilterText.setText(""); //$NON-NLS-1$
 
 		fFilterText.addModifyListener(new ModifyListener() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void modifyText(ModifyEvent e) {
 				String text = ((Text) e.widget).getText();
-				int length = text.length();
-				if (length > 0 && text.charAt(length - 1) != '*') {
-					text = text + '*';
-				}
 				setMatcherString(text);
 			}
 		});
@@ -410,7 +442,7 @@ public abstract class AbstractTableInformationControl {
 
 	/**
 	 * The string matcher has been modified. The default implementation
-	 * refreshes the view and selects the first macthed element
+	 * refreshes the view and selects the first matched element
 	 */
 	private void stringMatcherUpdated() {
 		// refresh viewer to refilter
@@ -429,16 +461,17 @@ public abstract class AbstractTableInformationControl {
 	 */
 	private void setMatcherString(String pattern) {
 		if (pattern.length() == 0) {
-			fStringMatcher = null;
+			fSearchPattern = null;
 		} else {
-			boolean ignoreCase = pattern.toLowerCase().equals(pattern);
-			fStringMatcher = new StringMatcher(pattern, ignoreCase, false);
+			SearchPattern patternMatcher = new SearchPattern();
+			patternMatcher.setPattern(pattern);
+			fSearchPattern = patternMatcher;
 		}
 		stringMatcherUpdated();
 	}
 
-	private StringMatcher getMatcher() {
-		return fStringMatcher;
+	private SearchPattern getMatcher() {
+		return fSearchPattern;
 	}
 
 	/**
@@ -453,7 +486,7 @@ public abstract class AbstractTableInformationControl {
 
 	/**
 	 * Delete all selected elements.
-	 * 
+	 *
 	 * @return <code>true</code> if there are no elements left after deletion.
 	 */
 	protected abstract boolean deleteSelectedElements();
@@ -477,7 +510,7 @@ public abstract class AbstractTableInformationControl {
 				.getLabelProvider();
 		for (int i = 0; i < items.length; i++) {
 			Object element = items[i].getData();
-			if (fStringMatcher == null) {
+			if (fSearchPattern == null) {
 				return element;
 			}
 
@@ -490,7 +523,7 @@ public abstract class AbstractTableInformationControl {
 				if (label.startsWith("*")) { //$NON-NLS-1$
 					label = label.substring(1);
 				}
-				if (fStringMatcher.match(label)) {
+				if (fSearchPattern.matches(label)) {
 					return element;
 				}
 			}
