@@ -1,5 +1,7 @@
 package org.eclipse.rap.e4.demo.parts;
 
+import java.util.Locale;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -46,12 +48,12 @@ public class NLSSamplePart {
 	}
 	
 	@Inject
-	public void setMessages(@Translation NLSMessages messages, @Named(TranslationService.LOCALE) String locale) {
+	public void setMessages(@Translation NLSMessages messages, @Named(TranslationService.LOCALE) Locale locale) {
 		currentLangLabel.setText(messages.NLSSamplePart_currentLangLabel);
-		currentLangValue.setText(locale);
+		currentLangValue.setText(locale.toString());
 		
 		updateLangLabel.setText(messages.NLSSamplePart_updateLangLabel);
-		updateLangValue.setText(locale);
+		updateLangValue.setText(locale.toString());
 		updateLangButton.setText(messages.NLSSamplePart_updateLangButton);
 		
 		currentLangLabel.getParent().layout(true);
