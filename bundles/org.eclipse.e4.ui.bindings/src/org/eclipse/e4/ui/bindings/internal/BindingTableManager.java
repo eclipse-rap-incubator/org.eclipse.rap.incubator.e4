@@ -40,12 +40,14 @@ public class BindingTableManager {
 		String contextId = getTableId(table.getId());
 		if (eclipseContext.containsKey(contextId)) {
 			return; // it's already there
-			//			throw new IllegalArgumentException("Already contains table " + contextId); //$NON-NLS-1$
+			// throw new IllegalArgumentException("Already contains table " +
+			// contextId); //$NON-NLS-1$
 		}
 		eclipseContext.set(contextId, table);
 		final List<Context> contexts = definedTables.getContexts();
 		if (!contexts.contains(table.getTableId())) {
-			// this is only valid because I'm throwing away the old definedTables contextSet
+			// this is only valid because I'm throwing away the old
+			// definedTables contextSet
 			contexts.add(table.getTableId());
 			definedTables = createContextSet(contexts);
 		}
@@ -63,7 +65,8 @@ public class BindingTableManager {
 		eclipseContext.remove(contextId);
 		final List<Context> contexts = definedTables.getContexts();
 		if (contexts.contains(table.getTableId())) {
-			// this is only valid because I'm throwing away the old definedTables contextSet
+			// this is only valid because I'm throwing away the old
+			// definedTables contextSet
 			contexts.remove(table.getTableId());
 			definedTables = createContextSet(contexts);
 		}
@@ -90,8 +93,7 @@ public class BindingTableManager {
 		return new ContextSet(contexts);
 	}
 
-	public Collection<Binding> getConflictsFor(ContextSet contextSet,
-			TriggerSequence triggerSequence) {
+	public Collection<Binding> getConflictsFor(ContextSet contextSet, TriggerSequence triggerSequence) {
 		Collection<Binding> matches = new ArrayList<Binding>();
 		for (Context ctx : contextSet.getContexts()) {
 			BindingTable table = getTable(ctx.getId());
@@ -159,18 +161,15 @@ public class BindingTableManager {
 		return mostActive == null ? false : mostActive.equals(currentResult.getSchemeId());
 	}
 
-	public Binding getBestSequenceFor(ContextSet contextSet,
-			ParameterizedCommand parameterizedCommand) {
-		ArrayList<Binding> bindings = (ArrayList<Binding>) getSequencesFor(contextSet,
-				parameterizedCommand);
+	public Binding getBestSequenceFor(ContextSet contextSet, ParameterizedCommand parameterizedCommand) {
+		ArrayList<Binding> bindings = (ArrayList<Binding>) getSequencesFor(contextSet, parameterizedCommand);
 		if (bindings.size() == 0) {
 			return null;
 		}
 		return bindings.get(0);
 	}
 
-	public Collection<Binding> getSequencesFor(ContextSet contextSet,
-			ParameterizedCommand parameterizedCommand) {
+	public Collection<Binding> getSequencesFor(ContextSet contextSet, ParameterizedCommand parameterizedCommand) {
 		ArrayList<Binding> bindings = new ArrayList<Binding>();
 		List<Context> contexts = contextSet.getContexts();
 		ListIterator<Context> it = contexts.listIterator(contexts.size());
@@ -243,8 +242,9 @@ public class BindingTableManager {
 	}
 
 	/*
-	 * Copied from org.eclipse.jface.bindings.BindingManager.compareSchemes(String, String)
-	 * 
+	 * Copied from
+	 * org.eclipse.jface.bindings.BindingManager.compareSchemes(String, String)
+	 *
 	 * Returns an in based on scheme 1 < scheme 2
 	 */
 	private final int compareSchemes(final String schemeId1, final String schemeId2) {
