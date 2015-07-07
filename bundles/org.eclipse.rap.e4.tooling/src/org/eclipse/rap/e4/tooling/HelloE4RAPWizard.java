@@ -41,7 +41,7 @@ public class HelloE4RAPWizard extends AbstractRAPWizard {
 	@Override
 	protected String getRequireBundles() {
 		return asString(new BundleValueEntry(true, "org.eclipse.rap.rwt",
-				"2.0.0", "3.0.0"), new BundleValueEntry(true,
+				"3.0.0", "4.0.0"), new BundleValueEntry(true,
 				"org.eclipse.rap.e4", "0.9.0", null),
 				BundleValueEntry.bundle("org.eclipse.e4.core.di"),
 				BundleValueEntry.bundle("org.eclipse.e4.core.di.extensions"),
