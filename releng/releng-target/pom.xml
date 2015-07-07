@@ -33,7 +33,6 @@
 		<module>../../bundles/org.eclipse.e4.ui.workbench.renderers.swt</module>
 		<module>../../bundles/org.eclipse.e4.ui.workbench.swt</module>
 		<module>../../bundles/org.eclipse.rap.e4</module>
-		<module>../../bundles/org.eclipse.e4.core.di</module>
 
 		<module>../../features/org.eclipse.rap.e4.target.feature</module>
 
@@ -64,7 +63,7 @@
 		<repository>
 			<id>luna</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/luna</url>
+			<url>http://download.eclipse.org/releases/mars</url>
 		</repository>
 	</repositories>
 
