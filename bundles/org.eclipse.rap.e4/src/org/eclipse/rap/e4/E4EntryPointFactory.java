@@ -77,22 +77,24 @@ public class E4EntryPointFactory implements EntryPointFactory {
 //		if (!checkInstanceLocation(instanceLocation, shell,
 //				workbench.getContext()))
 //			return EXIT_OK;
-
-		IEclipseContext workbenchContext = workbench.getContext();
-
-		// Create and run the UI (if any)
-		workbench.createAndRunUI(workbench.getApplication());
 		
-		// Save the model into the targetURI
-		if (e4App.lcManager != null) {
-			ContextInjectionFactory.invoke(e4App.lcManager, PreSave.class,
-					workbenchContext, null);
-		}
-		e4App.saveModel();
-		workbench.close();
+		if( workbench != null ) {
+			IEclipseContext workbenchContext = workbench.getContext();
 
-		if (workbench.isRestart()) {
-			return IApplication.EXIT_RESTART;
+			// Create and run the UI (if any)
+			workbench.createAndRunUI(workbench.getApplication());
+			
+			// Save the model into the targetURI
+			if (e4App.lcManager != null) {
+				ContextInjectionFactory.invoke(e4App.lcManager, PreSave.class,
+						workbenchContext, null);
+			}
+			e4App.saveModel();
+			workbench.close();
+
+			if (workbench.isRestart()) {
+				return IApplication.EXIT_RESTART;
+			}			
 		}
 
 		return IApplication.EXIT_OK;

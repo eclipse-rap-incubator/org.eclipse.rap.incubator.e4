@@ -34,13 +34,13 @@
 		<repository>
 			<id>luna</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/luna</url>
+			<url>http://download.eclipse.org/releases/mars</url>
 		</repository>
-		<repository>
+		<!--  repository>
 			<id>rap-nightly</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/rt/rap/nightly/runtime/</url>
-		</repository>
+		</repository-->
 		<!--  repository>
 			<id>luna-i-build</id>
 			<layout>p2</layout>
