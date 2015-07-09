@@ -689,8 +689,8 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	 */
 	private void addTopRight(CTabFolder ctf) {
 		Composite trComp = new Composite(ctf, SWT.NONE);
-		trComp.setBackground(Display.getCurrent().getSystemColor(
-				SWT.COLOR_DARK_CYAN));
+		// trComp.setBackground(Display.getCurrent().getSystemColor(
+		// SWT.COLOR_DARK_CYAN));
 		RowLayout rl = new RowLayout();
 		trComp.setLayout(rl);
 		rl.marginBottom = rl.marginTop = rl.marginRight = rl.marginLeft = 0;
