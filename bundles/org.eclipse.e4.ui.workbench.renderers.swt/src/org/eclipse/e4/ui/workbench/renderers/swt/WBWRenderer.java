@@ -332,7 +332,10 @@ public class WBWRenderer extends SWTPartRenderer {
 			});
 		}
 
-		wbwShell.setBackgroundMode(SWT.INHERIT_DEFAULT);
+		// RAP: Since the e4 theming is not supported yet by RAP, background colors aren't set
+		//      explictly. Global transparency will lead to transparent fast views.
+		// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=472301
+		// wbwShell.setBackgroundMode(SWT.INHERIT_DEFAULT);
 
 		Rectangle modelBounds = wbwShell.getBounds();
 		if (wbwModel instanceof EObject) {
