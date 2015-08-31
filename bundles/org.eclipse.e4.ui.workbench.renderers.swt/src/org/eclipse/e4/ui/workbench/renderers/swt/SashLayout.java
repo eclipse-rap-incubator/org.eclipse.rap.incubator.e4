@@ -188,6 +188,7 @@ public class SashLayout extends Layout {
 
 	// RAP: Use real Sash widgets instead of mouse track/move listeners
 	List<Sash> sashWidgets = new ArrayList<Sash>();
+	private static final String SELECTION_LISTENER_ID = "selListener"; //$NON-NLS-1$
 
 	private void updateSashWidgets() {
 		for (int i = 0; i < sashes.size(); i++) {
@@ -196,6 +197,11 @@ public class SashLayout extends Layout {
 				Sash sashWidget = sashWidgets.get(i);
 				if (isSameOrientation(sashWidget, sashRect)) {
 					sashWidget.setBounds(sashRect.rect);
+					sashWidget.removeListener(SWT.Selection, (Listener) sashWidget.getData(SELECTION_LISTENER_ID));
+
+					SelectionListener selListener = new SelectionListener(sashRect, sashWidget);
+					sashWidget.setData(SELECTION_LISTENER_ID, selListener);
+					sashWidget.addListener(SWT.Selection, selListener);
 				} else {
 					sashWidgets.set(i, createSash(sashRect)).dispose();
 				}
@@ -208,28 +214,41 @@ public class SashLayout extends Layout {
 		}
 	}
 
+	class SelectionListener implements Listener {
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
+
+		SashRect sashRect;
+		Sash sash;
+
+		public SelectionListener(SashRect sr, Sash sash) {
+			sashRect = sr;
+			this.sash = sash;
+		}
+
+		@Override
+		public void handleEvent(Event event) {
+			Display display = host.getDisplay();
+			Point cursorLocation = display.getCursorLocation();
+			Point mapped = display.map(null, host, cursorLocation);
+			List<SashRect> sashesToDrag = new ArrayList<SashLayout.SashRect>();
+			sashesToDrag.add(sashRect);
+			adjustWeights(sashesToDrag, mapped.x, mapped.y);
+			host.layout();
+			host.update();
+		}
+	}
+
 	private Sash createSash(final SashRect sashRect) {
 		boolean horizontal = !sashRect.container.isHorizontal();
 		Sash sash = new Sash(host, horizontal ? SWT.HORIZONTAL : SWT.VERTICAL);
 		sash.setBounds(sashRect.rect);
-		sash.addListener(SWT.Selection, new Listener() {
-			/**
-			 *
-			 */
-			private static final long serialVersionUID = 1L;
 
-			@Override
-			public void handleEvent(Event event) {
-				Display display = host.getDisplay();
-				Point cursorLocation = display.getCursorLocation();
-				Point mapped = display.map(null, host, cursorLocation);
-				sashesToDrag = new ArrayList<SashLayout.SashRect>();
-				sashesToDrag.add(sashRect);
-				adjustWeights(sashesToDrag, mapped.x, mapped.y);
-				host.layout();
-				host.update();
-			}
-		});
+		SelectionListener selListener = new SelectionListener(sashRect, sash);
+		sash.setData(SELECTION_LISTENER_ID, selListener);
+		sash.addListener(SWT.Selection, selListener);
 		return sash;
 	}
 
