@@ -1,0 +1,7 @@
+Verified+1: Hudson CI
+Code-Review+2: Ralf Sternberg <rsternberg@eclipsesource.com>
+Submitted-by: Markus Knauer <mknauer@eclipsesource.com>
+Submitted-at: Wed, 27 Jan 2016 11:43:52 -0500
+Reviewed-on: https://git.eclipse.org/r/65301
+Project: rap/incubator/org.eclipse.rap.incubator.e4
+Branch: refs/heads/master
