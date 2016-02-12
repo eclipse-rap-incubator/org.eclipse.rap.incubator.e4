@@ -1,0 +1,7 @@
+Code-Review+2: Ivan Furnadjiev <ivan@eclipsesource.com>
+Verified+1: Hudson CI
+Submitted-by: Markus Knauer <mknauer@eclipsesource.com>
+Submitted-at: Fri, 12 Feb 2016 09:39:08 -0500
+Reviewed-on: https://git.eclipse.org/r/66505
+Project: rap/incubator/org.eclipse.rap.incubator.e4
+Branch: refs/heads/master
