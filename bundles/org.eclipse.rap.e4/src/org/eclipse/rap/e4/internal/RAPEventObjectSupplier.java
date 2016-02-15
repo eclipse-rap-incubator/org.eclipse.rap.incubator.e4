@@ -18,7 +18,6 @@ import org.eclipse.e4.core.di.IInjector;
 import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.core.di.extensions.EventUtils;
-import org.eclipse.e4.core.di.internal.extensions.DIEActivator;
 import org.eclipse.e4.core.di.suppliers.ExtendedObjectSupplier;
 import org.eclipse.e4.core.di.suppliers.IObjectDescriptor;
 import org.eclipse.e4.core.di.suppliers.IRequestor;
@@ -176,7 +175,7 @@ public class RAPEventObjectSupplier extends ExtendedObjectSupplier {
 			if (registrations.containsKey(subscriber))
 				return;
 		}
-		BundleContext bundleContext = DIEActivator.getDefault().getBundleContext();
+		BundleContext bundleContext = Activator.getDefault().getBundleContext();
 		if (bundleContext == null)
 			throw new InjectionException("Unable to subscribe to events: org.eclipse.e4.core.di.extensions bundle is not activated"); //$NON-NLS-1$
 
@@ -205,7 +204,7 @@ public class RAPEventObjectSupplier extends ExtendedObjectSupplier {
 	}
 
 	static private EventAdmin getEventAdmin() {
-		return DIEActivator.getDefault().getEventAdmin();
+		return Activator.getDefault().getEventAdmin();
 	}
 
 	protected void unsubscribe(IRequestor requestor) {
