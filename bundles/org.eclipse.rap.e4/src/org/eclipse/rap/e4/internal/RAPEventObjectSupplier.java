@@ -40,7 +40,7 @@ public class RAPEventObjectSupplier extends ExtendedObjectSupplier {
 	// the proper method to start EventAdmin is added.
 	static {
 		if (getEventAdmin() == null) {
-			Bundle[] bundles = DIEActivator.getDefault().getBundleContext().getBundles();
+			Bundle[] bundles = Activator.getDefault().getBundleContext().getBundles();
 			for (Bundle bundle : bundles) {
 				if (!"org.eclipse.equinox.event".equals(bundle.getSymbolicName())) //$NON-NLS-1$
 					continue;
@@ -129,7 +129,7 @@ public class RAPEventObjectSupplier extends ExtendedObjectSupplier {
 	}
 
 	private Map<Subscriber, ServiceRegistration> registrations = new HashMap<Subscriber, ServiceRegistration>();
-	
+
 	@Inject
 	@Named(E4Application.INSTANCEID)
 	protected String instanceId;
