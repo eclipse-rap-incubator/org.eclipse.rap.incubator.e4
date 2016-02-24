@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 EclipseSource and others.
+ * Copyright (c) 2013, 2016 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,8 @@ final class BuildPropertiesModifier extends ResourceModifier {
           }
           writer.write( "bin.includes = META-INF/,\\" + NL ); //$NON-NLS-1$
           writer.write( "               OSGI-INF/,\\" + NL ); //$NON-NLS-1$
-          writer.write( "               ." + NL ); //$NON-NLS-1$
+          writer.write( "               .,\\" + NL ); //$NON-NLS-1$
+          writer.write( "               Application.e4xmi" + NL ); //$NON-NLS-1$
         } finally {
           writer.close();
         }
