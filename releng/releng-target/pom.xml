@@ -192,6 +192,7 @@
           <version>${tycho-version}</version>
           <configuration>
             <archiveSite>true</archiveSite>
+            <format>'rap-'yyyyMMdd-HHmm</format>
           </configuration>
         </plugin>
       </plugins>
