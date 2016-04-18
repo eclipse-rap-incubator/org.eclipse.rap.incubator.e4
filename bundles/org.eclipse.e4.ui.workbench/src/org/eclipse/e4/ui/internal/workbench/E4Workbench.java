@@ -17,7 +17,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.e4.core.commands.ExpressionContext;
-import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.Logger;
@@ -214,13 +213,14 @@ public class E4Workbench implements IWorkbench {
 	public boolean isRestart() {
 		return restart;
 	}
-
-	/**
-	 * @return a context that can be used to lookup OSGi services
-	 */
-	public static IEclipseContext getServiceContext() {
-		return EclipseContextFactory.getServiceContext(Activator.getDefault().getContext());
-	}
+	// TODO: Remove in RAP
+	// /**
+	// * @return a context that can be used to lookup OSGi services
+	// */
+	// public static IEclipseContext getServiceContext() {
+	// return
+	// EclipseContextFactory.getServiceContext(Activator.getDefault().getContext());
+	// }
 
 	@Override
 	public MApplication getApplication() {

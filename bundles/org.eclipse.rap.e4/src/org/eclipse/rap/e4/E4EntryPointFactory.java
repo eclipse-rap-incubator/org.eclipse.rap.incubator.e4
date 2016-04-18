@@ -33,9 +33,9 @@ public class E4EntryPointFactory implements EntryPointFactory {
 	private static final String PLUGIN_ID = "org.eclipse.e4.ui.workbench.rap";
 
 	private String productName;
-	
+
 	private E4ApplicationConfig config;
-	
+
 	public E4EntryPointFactory(E4ApplicationConfig config) {
 		this.config = config;
 	}
@@ -54,7 +54,7 @@ public class E4EntryPointFactory implements EntryPointFactory {
 			}
 		};
 	}
-	
+
 	private int createWorkbench() {
 		Display display = new Display();
 		E4Application e4App = new E4Application();
@@ -65,7 +65,7 @@ public class E4EntryPointFactory implements EntryPointFactory {
 			ServerPushSession session = new ServerPushSession();
 			session.start();
 		}
-		
+
 //		instanceLocation = (Location) workbench.getContext().get(
 //				E4Workbench.INSTANCE_LOCATION);
 		Shell shell = display.getActiveShell();
@@ -77,13 +77,14 @@ public class E4EntryPointFactory implements EntryPointFactory {
 //		if (!checkInstanceLocation(instanceLocation, shell,
 //				workbench.getContext()))
 //			return EXIT_OK;
-		
+
 		if( workbench != null ) {
 			IEclipseContext workbenchContext = workbench.getContext();
+			IEclipseContext serviceContext = workbenchContext.getParent();
 
 			// Create and run the UI (if any)
 			workbench.createAndRunUI(workbench.getApplication());
-			
+
 			// Save the model into the targetURI
 			if (e4App.lcManager != null) {
 				ContextInjectionFactory.invoke(e4App.lcManager, PreSave.class,
@@ -91,28 +92,29 @@ public class E4EntryPointFactory implements EntryPointFactory {
 			}
 			e4App.saveModel();
 			workbench.close();
+			serviceContext.dispose();
 
 			if (workbench.isRestart()) {
 				return IApplication.EXIT_RESTART;
-			}			
+			}
 		}
 
 		return IApplication.EXIT_OK;
 	}
-	
+
 	private IApplicationContext getApplicationContext(final E4ApplicationConfig config) {
 		return new IApplicationContext() {
-			
+
 			public org.osgi.framework.Bundle getBrandingBundle() {
 				return null;
 			}
-			
+
 			@Override
 			public void setResult(Object result, IApplication application) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public String getBrandingProperty(String key) {
 				if( IWorkbench.XMI_URI_ARG.equals(key) ) {
@@ -128,42 +130,42 @@ public class E4EntryPointFactory implements EntryPointFactory {
 				}
 				return null;
 			}
-			
+
 			@Override
 			public String getBrandingName() {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public String getBrandingId() {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public String getBrandingDescription() {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public String getBrandingApplication() {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public Map getArguments() {
 				Map<Object, Object> rv = new HashMap<Object, Object>();
 				rv.put(IApplicationContext.APPLICATION_ARGS, new String[0]);
 				return rv;
 			}
-			
+
 			@Override
 			public void applicationRunning() {
 				// TODO Auto-generated method stub
-				
+
 			}
 		};
 	}

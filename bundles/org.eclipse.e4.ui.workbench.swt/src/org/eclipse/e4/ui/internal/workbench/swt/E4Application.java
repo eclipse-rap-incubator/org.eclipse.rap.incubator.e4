@@ -1,20 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Tristan Hume - <trishume@gmail.com> -
- *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
- *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724, 446088
- *     Terry Parker <tparker@google.com> - Bug 416673
- *     Christian Georgi (SAP)            - Bug 432480
- ******************************************************************************/
-
 package org.eclipse.e4.ui.internal.workbench.swt;
 
 import java.io.File;
@@ -277,10 +260,12 @@ public class E4Application implements IApplication {
 
 		// for compatibility layer: set the application in the OSGi service
 		// context (see Workbench#getInstance())
-		if (!E4Workbench.getServiceContext().containsKey(MApplication.class)) {
-			// first one wins.
-			E4Workbench.getServiceContext().set(MApplication.class, appModel);
-		}
+		// TODO: Remove in RAP we have no compat layer
+		// if (!E4Workbench.getServiceContext().containsKey(MApplication.class))
+		// {
+		// // first one wins.
+		// E4Workbench.getServiceContext().set(MApplication.class, appModel);
+		// }
 
 		// Set the app's context after adding itself
 		appContext.set(MApplication.class, appModel);
@@ -522,7 +507,8 @@ public class E4Application implements IApplication {
 
 	// TODO This should go into a different bundle
 	public static IEclipseContext createDefaultHeadlessContext() {
-		IEclipseContext serviceContext = E4Workbench.getServiceContext();
+		IEclipseContext serviceContext = EclipseContextFactory
+				.createServiceContext(WorkbenchSWTActivator.getDefault().getContext());
 
 		IExtensionRegistry registry = RegistryFactory.getRegistry();
 		ExceptionHandler exceptionHandler = new ExceptionHandler();
