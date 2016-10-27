@@ -29,20 +29,23 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
 public class RAPEventBroker implements IEventBroker {
-	// TBD synchronization
+	    // TBD synchronization
+
+	    public static final String	ASYNC_EVENT = "rap.async.event";
+
 		private Map<EventHandler, Collection<ServiceRegistration<?>>> registrations = new HashMap<EventHandler, Collection<ServiceRegistration<?>>>();
 
 		@Inject
 		Logger logger;
-		
+
 		@Inject
 		@Optional
 		UISynchronize uiSync;
-		
+
 		@Inject
 		@Named(E4Application.INSTANCEID)
 		String instanceId;
-		
+
 		// This is a temporary code to ensure that bundle containing
 		// EventAdmin implementation is started. This code it to be removed once
 		// the proper method to start EventAdmin is added.
@@ -62,13 +65,13 @@ public class RAPEventBroker implements IEventBroker {
 				}
 			}
 		}
-		
+
 		public RAPEventBroker() {
 			// placeholder
 		}
 
 		public boolean send(String topic, Object data) {
-			Event event = constructEvent(topic, data);
+			Event event = constructEvent(topic, data, false);
 			EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
 			if (eventAdmin == null) {
 				logger.error(NLS.bind("No EventAdmin", event.toString()));
@@ -79,7 +82,7 @@ public class RAPEventBroker implements IEventBroker {
 		}
 
 		public boolean post(String topic, Object data) {
-			Event event = constructEvent(topic, data);
+			Event event = constructEvent(topic, data, true);
 			EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
 			if (eventAdmin == null) {
 				logger.error(NLS.bind("No EventAdmin", event.toString()));
@@ -90,18 +93,26 @@ public class RAPEventBroker implements IEventBroker {
 		}
 
 		@SuppressWarnings("unchecked")
-		private Event constructEvent(String topic, Object data) {
+		private Event constructEvent(String topic, Object data, boolean async) {
 			topic = rapifyTopic(instanceId, topic);
 			Event event;
 			if (data instanceof Dictionary<?,?>) {
-				event = new Event(topic, (Dictionary<String,?>)data);
+				Dictionary<String,Object> properties = (Dictionary<String,Object>)data;
+				if (async)
+					properties.put(ASYNC_EVENT, Boolean.TRUE);
+				event = new Event(topic, properties);
 			} else if (data instanceof Map<?,?>) {
-				event = new Event(topic, (Map<String,?>)data);
+				Map<String,Object> properties = (Map<String,Object>)data;
+				if (async)
+					properties.put(ASYNC_EVENT, Boolean.TRUE);
+				event = new Event(topic, properties);
 			} else {
-				Dictionary<String, Object> d = new Hashtable<String, Object>(2);
+				Dictionary<String, Object> d = new Hashtable<String, Object>(3);
 				d.put(EventConstants.EVENT_TOPIC, topic);
 				if (data != null)
 					d.put(IEventBroker.DATA, data);
+				if (async)
+					d.put(ASYNC_EVENT, Boolean.TRUE);
 				event = new Event(topic, d);
 			}
 			return event;
@@ -110,7 +121,7 @@ public class RAPEventBroker implements IEventBroker {
 		public boolean subscribe(String topic, EventHandler eventHandler) {
 			return subscribe(topic, null, eventHandler, false);
 		}
-		
+
 		public boolean subscribe(String topic, String filter, EventHandler eventHandler, boolean headless) {
 			topic = rapifyTopic(instanceId, topic);
 			BundleContext bundleContext = Activator.getDefault().getBundleContext();
@@ -146,7 +157,7 @@ public class RAPEventBroker implements IEventBroker {
 			}
 			return true;
 		}
-		
+
 		@PreDestroy
 		void dispose() {
 			Collection<Collection<ServiceRegistration<?>>> values = new ArrayList<Collection<ServiceRegistration<?>>>(
@@ -160,7 +171,7 @@ public class RAPEventBroker implements IEventBroker {
 				}
 			}
 		}
-		
+
 		public static String rapifyTopic(String instanceId, String topic) {
 			String rv = instanceId + "/" + topic;
 //			System.err.println("Original: " + topic + ", RAPified: " + rv);

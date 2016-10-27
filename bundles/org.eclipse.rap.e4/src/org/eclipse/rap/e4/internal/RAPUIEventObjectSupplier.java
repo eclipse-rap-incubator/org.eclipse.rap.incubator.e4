@@ -34,18 +34,26 @@ public class RAPUIEventObjectSupplier extends RAPEventObjectSupplier {
 					logger.log(Level.WARNING, "No realm found to process UI event " + event);
 				return;
 			} else {
-				uiSync.syncExec(new Runnable() {
-					public void run() {
-						requestor.execute();
-					}
-				});
+				if(Boolean.TRUE.equals(event.getProperty(RAPEventBroker.ASYNC_EVENT))) {
+					uiSync.asyncExec(new Runnable() {
+						public void run() {
+							requestor.execute();
+						}
+					});
+				} else {
+					uiSync.syncExec(new Runnable() {
+						public void run() {
+							requestor.execute();
+						}
+					});
+				}
 			}
-		}		
+		}
 	}
-	
+
 	@Inject
 	protected UISynchronize uiSync;
-	
+
 	@Inject @Optional
 	protected Logger logger;
 
