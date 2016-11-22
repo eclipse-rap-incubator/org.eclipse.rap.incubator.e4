@@ -26,7 +26,10 @@ public abstract class RAPAbstractObjectSupplierDispatcher<S extends ExtendedObje
 		
 		@Override
 		public void disposed(IEclipseContext context) {
-			rootContextMap.remove(context);
+			IEclipseContext rootContext = rootContextMap.remove(context);
+			if (rootContext != null) {
+				supplierCache.remove(rootContext);
+			}
 		}
 	};
 	
