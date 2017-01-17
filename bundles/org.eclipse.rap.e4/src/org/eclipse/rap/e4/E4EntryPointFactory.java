@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 EclipseSource and others.
+ * Copyright (c) 2012, 2017 EclipseSource and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *    Ralf Sternberg - initial API and implementation
+ *    EclipseSource - ongoing development
  *******************************************************************************/
 package org.eclipse.rap.e4;
 
@@ -83,16 +84,13 @@ public class E4EntryPointFactory implements EntryPointFactory {
 			IEclipseContext serviceContext = workbenchContext.getParent();
 
 			// Create and run the UI (if any)
-			workbench.createAndRunUI(workbench.getApplication());
-
-			// Save the model into the targetURI
-			if (e4App.lcManager != null) {
-				ContextInjectionFactory.invoke(e4App.lcManager, PreSave.class,
-						workbenchContext, null);
+			try {
+			    workbench.createAndRunUI(workbench.getApplication());
+			} finally {
+				e4App.saveModel();
+				workbench.close();
+				serviceContext.dispose();
 			}
-			e4App.saveModel();
-			workbench.close();
-			serviceContext.dispose();
 
 			if (workbench.isRestart()) {
 				return IApplication.EXIT_RESTART;
