@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -78,7 +78,11 @@ public class HandlerServiceImpl implements EHandlerService {
 		if (context == null) {
 			return DEFAULT_STACKLIST;
 		}
-		return (LinkedList<ExecutionContexts>) context.get("_handlerExecutionStack"); //$NON-NLS-1$
+		Object handlerExecutionStack = context.get("_handlerExecutionStack"); //$NON-NLS-1$
+		if (handlerExecutionStack == null) {
+			return DEFAULT_STACKLIST;
+		}
+		return (LinkedList<ExecutionContexts>) handlerExecutionStack;
 	}
 
 	public static void push(IEclipseContext ctx, IEclipseContext staticCtx) {
