@@ -20,6 +20,8 @@
     <junit-version>4.8.1</junit-version>
     <mockito-version>1.8.4</mockito-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <platform-repo.url>http://download.eclipse.org/eclipse/updates/4.6/</platform-repo.url>
+    <rap-runtime-repo.url>http://download.eclipse.org/rt/rap/nightly/runtime/</rap-runtime-repo.url>
     <download-publish-path>/shared/rt/rap/incubator/nightly/e4/target</download-publish-path>
   </properties>
 
@@ -39,26 +41,14 @@
 
   <repositories>
     <repository>
-      <id>simultaneous-release-repo</id>
+      <id>platform-repo</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/neon/</url>
-    </repository>
-    <!-- 
-    <repository>
-      <id>base-target</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/rap-incubator/e4/base-target</url>
+      <url>${platform-repo.url}</url>
     </repository>
     <repository>
-      <id>workspace</id>
+      <id>rap-repo</id>
       <layout>p2</layout>
-      <url>file:///Users/tomschindl/git/rap-e4-incubator/releng/org.eclipse.rap.e4.base.updatesite/target/site</url>
-    </repository>
-     -->
-    <repository>
-      <id>rap-nightly</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/rt/rap/nightly/runtime/</url>
+      <url>${rap-runtime-repo.url}</url>
     </repository>
   </repositories>
 
