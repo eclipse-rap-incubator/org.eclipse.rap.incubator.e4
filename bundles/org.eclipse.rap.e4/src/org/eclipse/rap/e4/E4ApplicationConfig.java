@@ -6,12 +6,14 @@ public class E4ApplicationConfig {
 	private boolean clearPersistedState;
 	private String lifecycleURI;
 	private String presentationURI;
+	private String modelResourcehandlerURI;
 	private boolean defaultPush;
 	
-	public E4ApplicationConfig(String xmiURI, String lifecycleURI, String presentationURI, boolean persistState, boolean clearPersistedState, boolean defaultPush) {
+	public E4ApplicationConfig(String xmiURI, String lifecycleURI, String presentationURI, String modelResourcehandlerURI, boolean persistState, boolean clearPersistedState, boolean defaultPush) {
 		this.xmiURI = xmiURI;
 		this.lifecycleURI = lifecycleURI;
 		this.presentationURI = presentationURI;
+		this.modelResourcehandlerURI = modelResourcehandlerURI;
 		this.persistState = persistState;
 		this.clearPersistedState = clearPersistedState;
 		this.defaultPush = defaultPush;
@@ -33,6 +35,10 @@ public class E4ApplicationConfig {
 		return presentationURI;
 	}
 	
+	public String getModelResourcehandlerURI() {
+		return modelResourcehandlerURI;
+	}
+	
 	public String getXmiURI() {
 		return xmiURI;
 	}
@@ -42,18 +48,18 @@ public class E4ApplicationConfig {
 	}
 	
 	public static E4ApplicationConfig create(String xmiURI) {
-		return new E4ApplicationConfig(xmiURI, null, null, true, false, true);
+		return new E4ApplicationConfig(xmiURI, null, null, null, true, false, true);
 	}
 	
 	public static E4ApplicationConfig create(String xmiURI, String lifecycleURI) {
-		return new E4ApplicationConfig(xmiURI, lifecycleURI, null, true, false, true);
+		return new E4ApplicationConfig(xmiURI, lifecycleURI, null, null, true, false, true);
 	}
 	
 	public static E4ApplicationConfig create(String xmiURI, boolean defaultPush) {
-		return new E4ApplicationConfig(xmiURI, null, null, true, false, true);
+		return new E4ApplicationConfig(xmiURI, null, null, null, true, false, true);
 	}
 	
 	public static E4ApplicationConfig create(String xmiURI, String lifecycleURI, boolean defaultPush) {
-		return new E4ApplicationConfig(xmiURI, lifecycleURI, null, true, false, true);
+		return new E4ApplicationConfig(xmiURI, lifecycleURI, null, null, true, false, true);
 	}
 }

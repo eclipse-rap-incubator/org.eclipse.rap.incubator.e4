@@ -8,6 +8,7 @@
  * Contributors:
  *    Ralf Sternberg - initial API and implementation
  *    EclipseSource - ongoing development
+ *    Benjamin Leipold - Allow definition of custom IModelResourceHandler
  *******************************************************************************/
 package org.eclipse.rap.e4;
 
@@ -125,6 +126,8 @@ public class E4EntryPointFactory implements EntryPointFactory {
 					return config.isClearPersistedState() + "";
 				} else if( IWorkbench.PERSIST_STATE.equals(key) ) {
 					return config.isPersistState() + "";
+				} else if( IWorkbench.MODEL_RESOURCE_HANDLER.equals(key) ) {
+					return config.getModelResourcehandlerURI();
 				}
 				return null;
 			}
